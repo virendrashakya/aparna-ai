@@ -1,0 +1,62 @@
+{
+  "character_id": "aparna_001",
+  "name": "Aparna Roy",
+
+  "master_reference": "references/identity/master.jpg",
+
+  "references": {
+    "face": [
+      "references/identity/face-front.jpg",
+      "references/identity/face-45.jpg",
+      "references/identity/face-profile.jpg"
+    ],
+    "body": "references/identity/body.jpg",
+    "hair": "references/identity/hair.jpg"
+  },
+
+  "identity_rules": {
+    "same_person": true,
+    "preserve_face": true,
+    "preserve_body": true,
+    "preserve_hair": true,
+    "preserve_age_appearance": true,
+
+    "allowed_variations": [
+      "facial_expression",
+      "pose",
+      "camera_angle",
+      "lighting",
+      "clothing",
+      "accessories",
+      "location"
+    ],
+
+    "never_change": [
+      "facial_identity",
+      "facial_structure",
+      "eye_shape",
+      "nose_structure",
+      "lip_structure",
+      "jaw_structure",
+      "body_identity",
+      "hair_identity",
+      "age_identity"
+    ]
+  },
+
+  "photography_target": {
+    "style": "natural human photography",
+    "priority": "photographic realism over beauty perfection",
+    "avoid": [
+      "generic AI influencer appearance",
+      "plastic skin",
+      "waxy skin",
+      "beauty filter",
+      "CGI appearance",
+      "3D render appearance",
+      "perfect facial symmetry",
+      "mannequin appearance",
+      "overly polished fashion campaign"
+    ]
+  }
+}

@@ -1,52 +1,45 @@
 {
   "version": 1,
-  "last_updated": null,
 
   "items": [
     {
-      "id": "top_001",
-      "type": "top",
-      "category": "casual",
-      "name": "",
-      "brand": "",
-      "color": "",
-      "secondary_colors": [],
+      "id": "dress_001",
 
-      "material": "",
-      "texture": "",
-      "pattern": "",
+      "name": "Black Cut-Out Bodycon Mini Dress",
 
-      "fit": "",
-      "neckline": "",
-      "sleeves": "",
-      "length": "",
+      "category": "dress",
 
-      "style": [],
-      "suitable_for": [],
-      "weather": [],
+      "brand": "LULU & SKY",
 
-      "home": true,
-      "public": true,
-      "private": false,
+      "color": "black",
 
-      "visual_description": "",
+      "fit": "bodycon",
 
-      "image_reference": null,
+      "length": "mini",
 
-      "acquired": {
-        "method": "purchase",
-        "from": null,
-        "date": null
+      "details": [
+        "cut-out",
+        "self-design"
+      ],
+
+      "occasion": [
+        "evening",
+        "party"
+      ],
+
+      "visual_reference": {
+        "front": "wardrobe/dress_001/front.jpg",
+        "back": "wardrobe/dress_001/back.jpg"
       },
+
+      "status": "available",
 
       "usage": {
         "times_worn": 0,
-        "last_worn": null,
         "times_posted": 0,
+        "last_worn": null,
         "last_posted": null
-      },
-
-      "status": "available"
+      }
     }
   ]
 }
