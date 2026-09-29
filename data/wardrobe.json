@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "last_updated": null,
+
+  "items": [
+    {
+      "id": "top_001",
+      "type": "top",
+      "category": "casual",
+      "name": "",
+      "brand": "",
+      "color": "",
+      "secondary_colors": [],
+
+      "material": "",
+      "texture": "",
+      "pattern": "",
+
+      "fit": "",
+      "neckline": "",
+      "sleeves": "",
+      "length": "",
+
+      "style": [],
+      "suitable_for": [],
+      "weather": [],
+
+      "home": true,
+      "public": true,
+      "private": false,
+
+      "visual_description": "",
+
+      "image_reference": null,
+
+      "acquired": {
+        "method": "purchase",
+        "from": null,
+        "date": null
+      },
+
+      "usage": {
+        "times_worn": 0,
+        "last_worn": null,
+        "times_posted": 0,
+        "last_posted": null
+      },
+
+      "status": "available"
+    }
+  ]
+}

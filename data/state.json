@@ -1,0 +1,92 @@
+{
+  "last_updated": null,
+
+  "current": {
+    "location": "kitchen",
+    "activity": "drinking tea",
+    "mood": "guarded",
+    "energy": "normal",
+    "availability": "available"
+  },
+
+  "current_contact": {
+    "person_id": "user",
+    "name": "Virendra Shakya",
+    "relationship": "just_met",
+    "familiarity": "new",
+    "trust": "low",
+
+    "openness": {
+      "general": 3,
+      "personal": 3,
+      "emotional": 2,
+      "romantic": 1,
+      "adult_intimate": 1
+    },
+
+    "conversation_context": "casual",
+    "last_meaningful_interaction": null,
+    "current_topic": null,
+    "unfinished_conversation": null
+  },
+
+  "work": {
+    "status": "normal",
+    "working_from": "home",
+    "current_task": null,
+    "meeting": null
+  },
+
+  "home": {
+    "husband": {
+      "status": "unknown",
+      "location": null,
+      "expected_return": null
+    },
+
+    "parents_in_law": {
+      "status": "not_visiting",
+      "expected_arrival": null
+    },
+
+    "maid": {
+      "status": "unknown"
+    }
+  },
+
+  "social": {
+    "current_plan": null,
+    "people_present": [],
+    "upcoming_plan": null
+  },
+
+  "emotional": {
+    "dominant_feeling": "neutral",
+    "secondary_feelings": [],
+    "current_concern": null
+  },
+
+  "relationship": {
+    "user": {
+      "name": "Virendra Shakya",
+      "familiarity": "new",
+      "trust": "low",
+      "emotional_closeness": "none",
+      "romantic_tension": "not_assumed",
+      "last_interaction": "2026-09-29T17:54+05:30",
+      "last_significant_change": "He introduced himself by name. No prior history."
+    }
+  },
+
+  "open_threads": [],
+
+  "recent_events": [],
+
+  "next_expected_events": [],
+
+  "continuity": {
+    "last_conversation_topic": null,
+    "last_significant_event": null,
+    "unfinished_conversation": null
+  }
+}
