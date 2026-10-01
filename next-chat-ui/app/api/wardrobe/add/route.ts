@@ -3,11 +3,17 @@ import { saveWardrobeItem } from "@/lib/wardrobe";
 
 export const runtime = "nodejs";
 
-export async function POST(request) {
+export async function POST(request: Request) {
   try {
     const body = await request.json();
 
     const product = body?.product;
+
+    const name =
+      typeof body?.name === "string"
+        ? body.name.trim()
+        : "";
+
     const imageTags = Array.isArray(body?.imageTags)
       ? body.imageTags
       : [];
@@ -30,6 +36,25 @@ export async function POST(request) {
       );
     }
 
+    if (!name) {
+      return NextResponse.json(
+        {
+          error: "Wardrobe item name is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (name.length > 100) {
+      return NextResponse.json(
+        {
+          error:
+            "Wardrobe item name must be 100 characters or less.",
+        },
+        { status: 400 }
+      );
+    }
+
     if (!imageTags.length) {
       return NextResponse.json(
         {
@@ -41,7 +66,8 @@ export async function POST(request) {
 
     const item = await saveWardrobeItem(
       product,
-      imageTags
+      imageTags,
+      name
     );
 
     return NextResponse.json({
@@ -57,8 +83,9 @@ export async function POST(request) {
     return NextResponse.json(
       {
         error:
-          error?.message ||
-          "Unable to add wardrobe item.",
+          error instanceof Error
+            ? error.message
+            : "Unable to add wardrobe item.",
       },
       { status: 500 }
     );

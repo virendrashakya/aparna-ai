@@ -98,16 +98,13 @@ function detectRetailer(url: string) {
 }
 
 function cleanText(value: unknown) {
-  if (
-    typeof value !== "string"
-  ) {
+  if (typeof value !== "string") {
     return null;
   }
 
-  const cleaned =
-    value
-      .replace(/\s+/g, " ")
-      .trim();
+  const cleaned = value
+    .replace(/\s+/g, " ")
+    .trim();
 
   return cleaned || null;
 }
@@ -116,28 +113,24 @@ function extractMeta(
   html: string,
   property: string
 ) {
-  const escaped =
-    property.replace(
-      /[-/\\^$*+?.()|[\]{}]/g,
-      "\\$&"
-    );
+  const escaped = property.replace(
+    /[-/\\^$*+?.()|[\]{}]/g,
+    "\\$&"
+  );
 
   const patterns = [
     new RegExp(
       `<meta[^>]+property=["']${escaped}["'][^>]+content=["']([^"']+)["']`,
       "i"
     ),
-
     new RegExp(
       `<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${escaped}["']`,
       "i"
     ),
-
     new RegExp(
       `<meta[^>]+name=["']${escaped}["'][^>]+content=["']([^"']+)["']`,
       "i"
     ),
-
     new RegExp(
       `<meta[^>]+content=["']([^"']+)["'][^>]+name=["']${escaped}["']`,
       "i"
@@ -169,9 +162,7 @@ function extractJsonLd(html: string) {
 
   for (const match of scripts) {
     try {
-      const parsed = JSON.parse(
-        match[1].trim()
-      );
+      const parsed = JSON.parse(match[1].trim());
 
       if (Array.isArray(parsed)) {
         results.push(...parsed);
@@ -195,8 +186,7 @@ function findProductSchema(
 
   if (Array.isArray(value)) {
     for (const item of value) {
-      const result =
-        findProductSchema(item);
+      const result = findProductSchema(item);
 
       if (result) {
         return result;
@@ -206,9 +196,7 @@ function findProductSchema(
     return null;
   }
 
-  if (
-    typeof value !== "object"
-  ) {
+  if (typeof value !== "object") {
     return null;
   }
 
@@ -226,10 +214,9 @@ function findProductSchema(
   }
 
   if (object["@graph"]) {
-    const result =
-      findProductSchema(
-        object["@graph"]
-      );
+    const result = findProductSchema(
+      object["@graph"]
+    );
 
     if (result) {
       return result;
@@ -264,9 +251,7 @@ function extractImages(
 ) {
   const images: string[] = [];
 
-  function addImage(
-    value: unknown
-  ) {
+  function addImage(value: unknown) {
     if (
       typeof value !== "string" ||
       !value.trim()
@@ -274,25 +259,19 @@ function extractImages(
       return;
     }
 
-    const url =
-      absoluteUrl(
-        value.trim(),
-        productUrl
-      );
+    const url = absoluteUrl(
+      value.trim(),
+      productUrl
+    );
 
-    if (
-      !url ||
-      images.includes(url)
-    ) {
+    if (!url || images.includes(url)) {
       return;
     }
 
     images.push(url);
   }
 
-  function processImage(
-    value: unknown
-  ) {
+  function processImage(value: unknown) {
     if (typeof value === "string") {
       addImage(value);
       return;
@@ -360,39 +339,27 @@ function inferCategory(
       name || ""
     }`.toLowerCase();
 
-  if (
-    value.includes("dress")
-  ) {
+  if (value.includes("dress")) {
     return "dress";
   }
 
-  if (
-    value.includes("saree")
-  ) {
+  if (value.includes("saree")) {
     return "saree";
   }
 
-  if (
-    value.includes("blouse")
-  ) {
+  if (value.includes("blouse")) {
     return "blouse";
   }
 
-  if (
-    value.includes("top")
-  ) {
+  if (value.includes("top")) {
     return "top";
   }
 
-  if (
-    value.includes("shirt")
-  ) {
+  if (value.includes("shirt")) {
     return "shirt";
   }
 
-  if (
-    value.includes("skirt")
-  ) {
+  if (value.includes("skirt")) {
     return "skirt";
   }
 
@@ -409,9 +376,6 @@ function inferCategory(
 
 /**
  * Fetch product information from a retailer URL.
- *
- * This is intentionally kept independent from
- * saveWardrobeItem().
  */
 export async function fetchProduct(
   productUrl: string
@@ -419,27 +383,21 @@ export async function fetchProduct(
   let parsedUrl: URL;
 
   try {
-    parsedUrl =
-      new URL(productUrl);
+    parsedUrl = new URL(productUrl);
   } catch {
     throw new Error(
       "Invalid product URL."
     );
   }
 
-  if (
-    parsedUrl.protocol !==
-    "https:"
-  ) {
+  if (parsedUrl.protocol !== "https:") {
     throw new Error(
       "Only HTTPS product URLs are supported."
     );
   }
 
   const retailer =
-    detectRetailer(
-      productUrl
-    );
+    detectRetailer(productUrl);
 
   if (!retailer) {
     throw new Error(
@@ -447,22 +405,20 @@ export async function fetchProduct(
     );
   }
 
-  const response =
-    await fetch(
-      productUrl,
-      {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
-          Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-          "Accept-Language":
-            "en-US,en;q=0.9",
-        },
-
-        cache: "no-store",
-      }
-    );
+  const response = await fetch(
+    productUrl,
+    {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language":
+          "en-US,en;q=0.9",
+      },
+      cache: "no-store",
+    }
+  );
 
   if (!response.ok) {
     throw new Error(
@@ -470,48 +426,34 @@ export async function fetchProduct(
     );
   }
 
-  const html =
-    await response.text();
+  const html = await response.text();
 
-  const jsonLd =
-    extractJsonLd(html);
+  const jsonLd = extractJsonLd(html);
 
-  const schema =
-    jsonLd
-      .map(findProductSchema)
-      .find(Boolean);
+  const schema = jsonLd
+    .map(findProductSchema)
+    .find(Boolean);
 
   const name =
+    cleanText(schema?.name) ||
     cleanText(
-      schema?.name
+      extractMeta(html, "og:title")
     ) ||
     cleanText(
-      extractMeta(
-        html,
-        "og:title"
-      )
-    ) ||
-    cleanText(
-      extractMeta(
-        html,
-        "twitter:title"
-      )
+      extractMeta(html, "twitter:title")
     );
 
-  const brand =
-    cleanText(
-      typeof schema?.brand ===
-        "string"
-        ? schema.brand
-        : schema?.brand?.name
-    );
+  const brand = cleanText(
+    typeof schema?.brand === "string"
+      ? schema.brand
+      : schema?.brand?.name
+  );
 
-  const images =
-    extractImages(
-      html,
-      schema,
-      productUrl
-    );
+  const images = extractImages(
+    html,
+    schema,
+    productUrl
+  );
 
   if (!images.length) {
     throw new Error(
@@ -520,50 +462,31 @@ export async function fetchProduct(
   }
 
   const productId =
-    cleanText(
-      schema?.sku
-    ) ||
-    cleanText(
-      schema?.productID
-    );
+    cleanText(schema?.sku) ||
+    cleanText(schema?.productID);
 
-  const category =
-    inferCategory(
-      schema,
-      name
-    );
+  const category = inferCategory(
+    schema,
+    name
+  );
 
   return {
     retailer,
-
     productId,
-
     productUrl,
-
     name,
-
     brand,
-
     category,
-
-    color:
-      cleanText(
-        schema?.color
-      ),
-
+    color: cleanText(schema?.color),
     fit: null,
-
     length: null,
-
     details: [],
-
-    images:
-      images.map(
-        (url, index) => ({
-          id: `image_${index + 1}`,
-          url,
-        })
-      ),
+    images: images.map(
+      (url, index) => ({
+        id: `image_${index + 1}`,
+        url,
+      })
+    ),
   };
 }
 
@@ -581,9 +504,8 @@ function getTagFilename(
   ];
 
   return (
-    priority.find(
-      (tag) =>
-        tags.includes(tag)
+    priority.find((tag) =>
+      tags.includes(tag)
     ) || null
   );
 }
@@ -592,18 +514,17 @@ async function downloadImage(
   url: string,
   destination: string
 ) {
-  const response =
-    await fetch(
-      url,
-      {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
-          Accept:
-            "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
-        },
-      }
-    );
+  const response = await fetch(
+    url,
+    {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
+        Accept:
+          "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error(
@@ -611,10 +532,9 @@ async function downloadImage(
     );
   }
 
-  const buffer =
-    Buffer.from(
-      await response.arrayBuffer()
-    );
+  const buffer = Buffer.from(
+    await response.arrayBuffer()
+  );
 
   await fs.writeFile(
     destination,
@@ -624,8 +544,24 @@ async function downloadImage(
 
 export async function saveWardrobeItem(
   product: WardrobeProduct,
-  imageTags: ImageTag[]
+  imageTags: ImageTag[],
+  customName: string
 ) {
+  const wardrobeName =
+    customName.trim();
+
+  if (!wardrobeName) {
+    throw new Error(
+      "Wardrobe item name is required."
+    );
+  }
+
+  if (wardrobeName.length > 100) {
+    throw new Error(
+      "Wardrobe item name must be 100 characters or less."
+    );
+  }
+
   await fs.mkdir(
     WARDROBE_DIRECTORY,
     {
@@ -633,10 +569,12 @@ export async function saveWardrobeItem(
     }
   );
 
+  /*
+   * Use the custom wardrobe name for the
+   * canonical item directory ID.
+   */
   const itemId =
-    `${slugify(
-      product.brand || "item"
-    )}_${createId().slice(0, 8)}`;
+    `${slugify(wardrobeName)}_${createId().slice(0, 8)}`;
 
   const itemDirectory =
     path.join(
@@ -679,14 +617,10 @@ export async function saveWardrobeItem(
     }
 
     const extension =
-      getExtension(
-        image.url
-      );
+      getExtension(image.url);
 
     const tags =
-      Array.isArray(
-        image.tags
-      )
+      Array.isArray(image.tags)
         ? image.tags
         : [];
 
@@ -761,6 +695,11 @@ export async function saveWardrobeItem(
   const wardrobeItem = {
     id: itemId,
 
+    /*
+     * User-defined canonical wardrobe name.
+     */
+    name: wardrobeName,
+
     source: {
       retailer:
         product.retailer ||
@@ -776,7 +715,19 @@ export async function saveWardrobeItem(
     },
 
     garment: {
-      name:
+      /*
+       * Keep garment.name aligned with the
+       * user's canonical wardrobe name so
+       * downstream image/content systems use
+       * the name the user chose.
+       */
+      name: wardrobeName,
+
+      /*
+       * Preserve the retailer's original
+       * product name separately.
+       */
+      original_name:
         product.name ||
         null,
 

@@ -1,0 +1,89 @@
+{
+  "id": "anayna_72e596a2",
+  "source": {
+    "retailer": "myntra.com",
+    "product_id": "24865792",
+    "url": "https://www.myntra.com/skirts/anayna/anayna-women-printed-a-line-flared-cotton-maxi-skirt/24865792/buy"
+  },
+  "garment": {
+    "name": "Anayna Women Printed A-Line Flared Cotton Maxi Skirt",
+    "brand": "anayna",
+    "category": "skirt",
+    "color": null,
+    "fit": null,
+    "length": null,
+    "details": []
+  },
+  "visual_reference": {
+    "front": "wardrobe/anayna_72e596a2/front.jpg",
+    "back": null,
+    "side": null,
+    "closeup_front": null,
+    "closeup_back": null,
+    "closeup_side": null,
+    "dress_only": null
+  },
+  "images": [
+    {
+      "id": "image_1",
+      "source_url": "https://assets.myntassets.com/h_1440,q_100,w_1080/v1/assets/images/24865792/2023/10/4/2f7f7251-0d0b-4cb5-b0ce-19acbe3f57771696415933351-Anayna-Women-Printed-A-Line-Flared-Cotton-Maxi-Skirt-3831696-7.jpg",
+      "local_path": "wardrobe/anayna_72e596a2/front.jpg",
+      "tags": [
+        "front"
+      ]
+    },
+    {
+      "id": "image_2",
+      "source_url": "https://assets.myntassets.com/h_200,w_200,c_fill,g_auto/h_1440,q_75,w_1080/v1/assets/images/24865792/2023/10/4/2f7f7251-0d0b-4cb5-b0ce-19acbe3f57771696415933351-Anayna-Women-Printed-A-Line-Flared-Cotton-Maxi-Skirt-3831696-7.jpg",
+      "local_path": "wardrobe/anayna_72e596a2/image_2.jpg",
+      "tags": []
+    },
+    {
+      "id": "image_3",
+      "source_url": "https://constant.myntassets.com/pwa/assets/img/Icon-App-60x60@3x_2021.png",
+      "local_path": "wardrobe/anayna_72e596a2/image_3.png",
+      "tags": []
+    },
+    {
+      "id": "image_4",
+      "source_url": "https://constant.myntassets.com/web/assets/img/MyntraWebSprite_27_01_2021.png",
+      "local_path": "wardrobe/anayna_72e596a2/image_4.png",
+      "tags": []
+    },
+    {
+      "id": "image_5",
+      "source_url": "https://constant.myntassets.com/web/assets/img/icon.5d108c858a0db793700f0be5d3ad1e120a01a500_2021.png",
+      "local_path": "wardrobe/anayna_72e596a2/image_5.png",
+      "tags": []
+    },
+    {
+      "id": "image_6",
+      "source_url": "https://constant.myntassets.com/web/assets/img/logo_2021.png",
+      "local_path": "wardrobe/anayna_72e596a2/image_6.png",
+      "tags": []
+    },
+    {
+      "id": "image_7",
+      "source_url": "https://constant.myntassets.com/checkout/assets/img/smartbuy.webp",
+      "local_path": "wardrobe/anayna_72e596a2/image_7.webp",
+      "tags": []
+    },
+    {
+      "id": "image_8",
+      "source_url": "https://constant.myntassets.com/web/assets/img/sudio-nav-banner.png",
+      "local_path": "wardrobe/anayna_72e596a2/image_8.png",
+      "tags": []
+    }
+  ],
+  "aparna": {
+    "status": "available",
+    "public_content": true
+  },
+  "usage": {
+    "times_worn": 0,
+    "times_posted": 0,
+    "last_worn": null,
+    "last_posted": null
+  },
+  "created_at": "2026-09-29T15:31:19.891Z"
+}

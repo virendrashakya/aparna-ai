@@ -1,516 +1,706 @@
-# Aparna Image Generation Skill
+# APARNA IMAGE GENERATION SKILL
 
-## Purpose
+## PURPOSE
 
-Generate photographs of Aparna as the SAME fictional adult woman across
-different days, outfits, locations, moods and situations.
+Generate one realistic photograph of Aparna using her established
+visual identity, canonical wardrobe, location references, and current
+life state.
 
-The objective is NOT to generate a new realistic woman every time.
+The goal is:
 
-The objective is to create another believable photograph of the SAME Aparna.
+"another real photograph of Aparna"
 
----
+NOT:
 
-# CORE PRINCIPLE
-
-Aparna is a persistent visual identity.
-
-Never reconstruct her identity from text alone.
-
-Visual references have higher priority than descriptive text.
-
-Priority order:
-
-1. Aparna master identity reference
-2. Face references
-3. Body reference
-4. Hair reference
-5. Wardrobe reference
-6. Location reference
-7. Current state
-8. SOUL.md
-9. User-selected scene description
-
-Text describes the situation.
-
-Reference images define what Aparna looks like.
+"a newly generated AI woman who resembles Aparna."
 
 ---
 
-# REQUIRED INPUTS
+# 1. INPUT PRIORITY
 
-Before image generation, resolve:
+When generating an image, use information in this priority order:
 
-- time
-- mood
-- outfit
-- location
-- shot/camera framing
+1. Visual identity references
+2. Canonical wardrobe references
+3. Location references
+4. Current state
+5. Current life context
+6. SOUL.md
+7. Scene-specific instructions
 
-Also load:
-
-- data/visual_identity.json
-- data/wardrobe.json
-- data/state.json
-- SOUL.md
-- relevant location references
+Never replace visual references with text descriptions when a reference
+image exists.
 
 ---
 
-# IDENTITY REFERENCES
+# 2. REQUIRED WORKSPACE DATA
 
-Read:
+Before generating an image, inspect the relevant files.
 
-data/visual_identity.json
+Required:
 
-The master reference is:
+SOUL.md
+data/state.json
+data/wardrobe.json
+data/life.md
+references/
+locations/
 
-references/identity/master.jpg
+For visual identity, use:
 
-Face references:
+references/face/
+references/body/
+references/hair/
 
-references/identity/face-front.jpg
-references/identity/face-45.jpg
-references/identity/face-profile.jpg
-
-Body reference:
-
-references/identity/body.jpg
-
-Hair reference:
-
-references/identity/hair.jpg
-
-These references define Aparna's persistent visual identity.
-
-Do not redesign her face.
-
-Do not substitute another woman.
-
-Do not create a generic Indian fashion model.
-
-Do not make her younger.
-
-Do not make her older.
-
-Do not change her facial structure.
-
-Do not change her body identity.
-
-Do not change her hair identity.
-
----
-
-# SAME PERSON RULE
-
-Every generated image must look like another photograph of the same person.
-
-Natural changes are allowed:
-
-- expression
-- pose
-- lighting
-- camera angle
-- clothing
-- accessories
-- environment
-
-Identity changes are NOT allowed:
-
-- different face
-- different facial proportions
-- different eyes
-- different nose
-- different lips
-- different jaw
-- different body identity
-- different age appearance
-- completely different hair identity
-
----
-
-# WARDROBE
-
-When an outfit is selected:
-
-1. Read data/wardrobe.json.
-2. Find the selected outfit ID.
-3. Resolve its visual reference images.
-4. Use those images as the garment reference.
-5. Preserve the actual garment.
-
-Do not invent a different garment when a visual reference exists.
-
-Preserve:
-
-- color
-- material
-- silhouette
-- neckline
-- sleeves
-- straps
-- length
-- seams
-- patterns
-- construction
-- texture
-- hardware
-- embroidery
-- prints
-
-The garment must behave like real fabric.
-
-Use realistic:
-
-- folds
-- wrinkles
-- tension
-- compression
-- seams
-- shadows
-- contact with the body
-
-Never make clothing look painted onto the body.
-
----
-
-# LOCATION
-
-When a known Aparna location is selected:
-
-Use the established location reference from:
+For locations, use the relevant location directory under:
 
 locations/
 
-Preserve the established:
+For wardrobe, use:
 
-- room structure
-- furniture
-- walls
-- windows
-- doors
-- balcony
-- kitchen layout
-- bedroom layout
-- general architectural identity
+data/wardrobe.json
 
-Do not randomly redesign Aparna's apartment.
+and the selected wardrobe item's local visual references.
 
 ---
 
-# PHOTOGRAPHIC REALISM
+# 3. VISUAL IDENTITY
 
-The result must look like a real photograph of a real adult woman.
+Aparna is a fictional adult Indian woman with an established visual
+identity.
 
-Think:
+The generated image MUST depict the same established person.
 
-"real person photographed by a real camera"
+Preserve:
 
-NOT:
+- facial structure
+- facial proportions
+- eyes
+- eyebrows
+- nose
+- lips
+- jawline
+- cheek structure
+- skin tone
+- body proportions
+- height impression
+- hair length
+- hair texture
+- hair color
+- overall age appearance
 
-"AI fashion model"
+Do not randomly redesign her face.
 
-NOT:
+Do not create a generic AI fashion model.
 
-"3D render"
+Do not substitute another woman.
 
-NOT:
+Do not intentionally make her younger or older.
 
-"CGI character"
-
-NOT:
-
-"beauty advertisement"
-
-NOT:
-
-"perfect stock photograph"
-
-NOT:
-
-"plastic AI influencer"
+Do not transform her into a commercial fashion-model identity.
 
 ---
 
-# FACE REALISM
+# 4. HUMAN PHOTOGRAPHY
+
+The output should look like a photograph of a real person.
+
+Prioritize photographic realism over perfection.
 
 Use:
 
 - natural facial asymmetry
 - realistic skin texture
-- realistic pores
-- subtle skin variation
-- natural lips
-- realistic eyes
-- natural under-eye texture
-- subtle imperfections
-- realistic facial shadows
+- subtle pores
+- natural tonal variation
+- realistic hair strands
+- natural flyaway hair
+- believable anatomy
+- realistic hands
+- realistic fingers
+- realistic joints
+- physically plausible posture
+- realistic fabric behavior
+- natural lighting
+- realistic depth of field
+- realistic camera perspective
 
 Avoid:
 
 - plastic skin
 - waxy skin
 - porcelain skin
-- excessive smoothing
-- beauty-filter skin
-- perfect symmetry
-- oversized eyes
-- exaggerated lips
-- artificial facial glow
+- beauty-filter appearance
+- CGI appearance
+- mannequin appearance
+- 3D-render appearance
+- perfect facial symmetry
+- excessive beauty retouching
+- artificial skin glow
+- overly polished commercial photography
 
 ---
 
-# HAIR REALISM
+# 5. FACE
 
-Hair must look physically real.
+The face must remain consistent with Aparna's established visual
+references.
 
-Use:
-
-- individual strands
-- natural flyaways
-- realistic density
-- natural volume
-- believable shadows
-- realistic interaction with light
+Do not reconstruct her identity from generic textual descriptions
+when visual references are available.
 
 Avoid:
 
-- plastic hair
-- painted hair
-- CGI hair
-- perfectly separated artificial strands
+- oversized eyes
+- exaggerated lips
+- unnaturally sharp jaw
+- perfect symmetry
+- artificial skin
+- generic influencer face
+- doll-like appearance
+
+The final face should feel like the same person photographed under
+different lighting and on a different day.
 
 ---
 
-# BODY REALISM
+# 6. HAIR
 
-Use natural human anatomy.
+Preserve Aparna's established hairstyle and hair characteristics.
+
+Hair should contain:
+
+- individual strands
+- realistic density
+- natural flyaways
+- believable shadows
+- physically plausible interaction with light
+
+Avoid:
+
+- plastic-looking hair
+- painted hair
+- CGI hair
+- perfectly separated strands
+- unnaturally perfect styling
+
+---
+
+# 7. BODY AND ANATOMY
+
+Use the established body reference.
+
+Do not invent exaggerated proportions.
+
+Hands and feet require special attention.
 
 Check:
 
-- shoulders
-- arms
-- elbows
-- wrists
-- hands
-- fingers
-- torso
-- hips
-- knees
-- ankles
+- finger count
+- finger structure
+- hand position
+- wrist connection
+- arm connection
+- shoulder anatomy
+- leg proportions
+- knee structure
+- ankle structure
 - feet
+- natural posture
 
-Avoid:
-
-- mannequin anatomy
-- distorted limbs
-- unnatural joints
-- impossible posture
-- exaggerated proportions
-- floating body parts
+Avoid mannequin-like anatomy.
 
 ---
 
-# HANDS
+# 8. WARDROBE
 
-Hands require special attention.
+The selected outfit MUST come from the canonical wardrobe.
 
-Before accepting the image check:
+Resolve the outfit ID against:
 
-- correct number of fingers
-- realistic finger length
-- realistic joints
-- natural hand position
-- believable contact with objects
-- believable connection between wrist and hand
+data/wardrobe.json
 
-If hands are visibly incorrect, reject the image.
+Then resolve its visual references.
 
----
+Do not invent a replacement garment.
 
-# CAMERA REALISM
+Preserve:
 
-The photograph should behave like an actual camera photograph.
+- color
+- silhouette
+- material
+- neckline
+- sleeves
+- straps
+- seams
+- buttons
+- length
+- construction
+- pattern
+- texture
+- distinctive garment details
 
-Use believable:
+Fabric must behave physically.
 
-- perspective
-- exposure
-- white balance
-- depth of field
-- focus
-- lens characteristics
-- shadows
-- reflections
-- highlights
+Use:
 
-Do not make every photograph look like a commercial fashion campaign.
+- natural wrinkles
+- realistic folds
+- realistic tension
+- believable seams
+- natural compression
+- realistic contact shadows
 
-Some images should feel like:
-
-- smartphone photographs
-- mirror photographs
-- casual indoor photographs
-- photographs taken by friends
-- normal lifestyle photographs
+Do not make clothing look painted onto the body.
 
 ---
 
-# LIGHTING
+# 9. GARMENT SAFETY / PRODUCT REFERENCE
 
-Lighting must match the selected time and location.
+Retailer product images are garment references.
+
+They are NOT identity references.
+
+Never copy the retailer model's:
+
+- face
+- body
+- hair
+- pose
+- identity
+
+Use only the garment information.
+
+If the wardrobe item contains an AI-processed garment-only reference,
+prefer that reference over the original retailer model photograph.
+
+---
+
+# 10. CATEGORY-AWARE WARDROBE
+
+Different garment categories require different handling.
+
+## Dress
+
+Preserve the complete dress:
+
+- neckline
+- bodice
+- sleeves
+- straps
+- waist
+- skirt
+- hem
+- construction
+- decorative details
+
+## Top
+
+Preserve:
+
+- neckline
+- shoulders
+- sleeves
+- torso
+- hem
+- construction details
+
+## Bottom
+
+Preserve:
+
+- waistband
+- rise
+- pockets
+- seams
+- legs/skirt structure
+- hem
+
+## Saree
+
+Preserve:
+
+- saree textile
+- border
+- pallu
+- print
+- embroidery
+- drape characteristics
+
+Do not convert a saree into a generic dress.
+
+## Lehenga
+
+Treat as a coordinated set:
+
+- lehenga
+- blouse/choli
+- dupatta
+
+## Salwar Suit
+
+Treat as:
+
+- kurta
+- bottom
+- dupatta
+
+## Co-ord Set
+
+Treat as:
+
+- top
+- matching bottom
+
+---
+
+# 11. LOCATION
+
+Respect the selected location.
+
+For Aparna's Mumbai apartment, preserve established environmental
+continuity.
+
+Do not randomly turn the apartment into:
+
+- hotel
+- palace
+- penthouse
+- luxury showroom
+- Dubai-style apartment
+- unrealistic mansion
+
+Use the relevant location reference from:
+
+locations/
+
+---
+
+# 12. TIME
+
+Use the requested time to determine the physical lighting.
 
 Morning:
 
 - natural daylight
-- soft shadows
-- realistic indoor daylight
+- softer shadows
+- fresh indoor atmosphere
 
 Afternoon:
 
-- brighter natural light
-- stronger directional light when appropriate
+- brighter daylight
+- stronger natural illumination
 
 Evening:
 
 - fading daylight
-- warm indoor lighting
-- realistic mixed lighting
+- warm indoor lights
+- mixed color temperature
+- realistic dusk ambience
 
 Night:
 
-- realistic interior lighting
-- believable shadows
-- no artificial cinematic glow unless specifically requested
+- appropriate artificial indoor lighting
+- darker windows
+- realistic exposure
+
+Do not simply describe the time.
+
+Make the lighting physically reflect it.
 
 ---
 
-# MOOD
+# 13. MOOD
 
-Mood controls:
+Use mood to influence:
 
 - expression
-- eyes
 - posture
+- gaze
 - body language
 - energy
 
-Keep expressions believable.
+Keep the expression believable.
 
-Do not force an influencer pose.
+Avoid:
 
-Do not force a smile.
-
-Do not make every image seductive.
-
-Do not make every image glamorous.
-
-Aparna should look like a person living her life.
+- exaggerated influencer expressions
+- forced smiling
+- artificial seduction
+- theatrical posing
+- mannequin posing
 
 ---
 
-# CONTENT REALISM
+# 14. CAMERA
 
-Not every photograph should be perfect.
+The selected shot determines composition.
 
-Allow:
+Examples:
 
-- slight framing imperfections
-- normal posture
-- ordinary expressions
-- realistic background clutter
-- natural hair imperfections
-- normal clothing wrinkles
-- realistic smartphone-camera characteristics
+Full body:
 
-The goal is believable life, not perfection.
+- entire person visible
+- feet visible where appropriate
+- natural camera distance
+- believable perspective
 
----
+Half body:
 
-# IMAGE GENERATION PROCESS
+- natural crop
 
-Follow this sequence:
+Portrait:
 
-1. Load Aparna identity references.
-2. Load the selected outfit reference.
-3. Load the selected location reference.
-4. Resolve time and mood.
-5. Create the photograph using the references.
-6. Inspect the generated image.
-7. Check identity.
-8. Check anatomy.
-9. Check hands.
-10. Check clothing.
-11. Check lighting.
-12. Check environment.
-13. Check photographic realism.
+- realistic facial framing
+
+Use realistic:
+
+- focal length
+- perspective
+- depth of field
+- exposure
+- white balance
+- focus
+- shadow falloff
+- optical characteristics
+
+The photograph may contain subtle imperfections.
 
 ---
 
-# QUALITY CHECK
+# 15. INSTAGRAM REALISM
 
-Before returning the final image, answer internally:
+The result should feel like something Aparna genuinely photographed or
+had a friend photograph.
 
-IDENTITY:
-Does this look like the same Aparna?
+Prefer:
 
-FACE:
-Is the facial structure consistent?
+- natural framing
+- realistic smartphone/camera characteristics
+- slightly imperfect composition
+- believable lighting
+- ordinary apartment details
+- natural posture
 
-BODY:
-Does the body remain consistent?
+Avoid:
 
-HAIR:
-Does the hair identity remain consistent?
-
-OUTFIT:
-Is the selected garment correctly represented?
-
-ANATOMY:
-Are the body and hands believable?
-
-LOCATION:
-Does the environment match the selected location?
-
-LIGHT:
-Does the lighting match the selected time?
-
-PHOTOGRAPH:
-Does this look like a genuine photograph?
+- fashion campaign aesthetic
+- stock photography
+- studio perfection
+- excessive retouching
+- artificial influencer aesthetic
 
 ---
 
-# FAILURE CONDITIONS
+# 16. EXACTLY ONE IMAGE
 
-Reject and regenerate/edit if:
+Generate exactly ONE photograph.
 
-- Aparna looks like a different woman
-- face identity changed significantly
-- skin looks plastic
-- body looks like a mannequin
-- hands are visibly malformed
-- clothing looks painted on
-- background geometry is obviously wrong
-- lighting looks artificial
-- image looks like CGI
-- image looks like a generic AI influencer
+Never generate:
 
-Prefer targeted correction/editing when possible.
+- collage
+- contact sheet
+- split screen
+- multiple poses
+- multiple versions
+- before/after
+- multiple people
 
-Do not blindly regenerate a completely different woman.
+unless explicitly requested.
 
 ---
 
-# FINAL PRINCIPLE
+# 17. IMAGE GENERATION PROCESS
 
-Aparna does not get reinvented for every image.
+Follow this process:
 
-She is one persistent fictional adult woman.
+1. Resolve Aparna identity references.
+2. Resolve selected wardrobe item.
+3. Resolve garment visual references.
+4. Resolve location reference.
+5. Resolve time.
+6. Resolve mood.
+7. Resolve camera/shot.
+8. Construct concise generation prompt.
+9. Call the image-generation tool.
+10. Inspect the result.
+11. Check identity consistency.
+12. Check anatomy.
+13. Check wardrobe accuracy.
+14. Check environment.
+15. Check lighting.
+16. Check photographic realism.
+17. Return the accepted image.
 
-Every new image should feel like:
+Do not unnecessarily repeat the same generation request.
 
-"Here is another photograph of Aparna."
+---
 
-Not:
+# 18. CONTENT MODERATION HANDLING
 
-"Here is another AI-generated woman."
+This section is critical.
+
+If the image-generation provider rejects the request because of
+content moderation, DO NOT repeatedly retry the same request.
+
+Treat the moderation result as terminal for that generation attempt.
+
+Recognize errors containing terms such as:
+
+- content-moderated
+- content moderation
+- moderation
+- safety
+- policy violation
+- safety filter
+- rejected by content moderation
+- imagine:content-moderated
+
+When such an error occurs:
+
+1. Stop the current generation attempt.
+2. Do not call image generation again with the same prompt.
+3. Do not repeatedly modify wording to try to bypass moderation.
+4. Do not retry the same reference image repeatedly.
+5. Do not wait for the task to naturally time out.
+6. Return a structured failure immediately.
+
+Use:
+
+{
+  "status": "moderated",
+  "reason": "xai_content_moderation",
+  "retryable": false,
+  "description": "The image-generation provider rejected this generation request through its content-moderation system.",
+  "image": null
+}
+
+If the provider exposes a different moderation error string, normalize
+it to the same result.
+
+The controller must NOT attempt to circumvent provider safety
+controls.
+
+---
+
+# 19. NON-MODERATION FAILURES
+
+For normal transient failures:
+
+- timeout
+- temporary provider failure
+- network failure
+- unavailable provider
+- temporary server error
+
+a retry may be appropriate according to the surrounding OpenClaw
+workflow.
+
+However:
+
+CONTENT MODERATION != TRANSIENT FAILURE
+
+Never treat a moderation rejection as a normal retryable error.
+
+---
+
+# 20. ABORT HANDLING
+
+If the image-generation task is aborted after a provider moderation
+failure, preserve the original moderation state.
+
+Do not reinterpret the final error:
+
+"This operation was aborted"
+
+as the primary cause.
+
+If an earlier provider response contains:
+
+content-moderated
+
+then the correct result remains:
+
+{
+  "status": "moderated",
+  "reason": "xai_content_moderation",
+  "retryable": false
+}
+
+The provider moderation event is the root cause.
+
+---
+
+# 21. QUALITY CONTROL
+
+After successful generation inspect:
+
+1. Is this a real-looking human photograph?
+2. Is this the same Aparna?
+3. Is the face consistent?
+4. Is the body consistent?
+5. Are the hands correct?
+6. Are the fingers correct?
+7. Is the anatomy plausible?
+8. Is the wardrobe correct?
+9. Does the garment construction match the canonical wardrobe?
+10. Are the fabric folds realistic?
+11. Is the location correct?
+12. Does the lighting match the requested time?
+13. Does the expression match the requested mood?
+14. Does the image look like a genuine photograph?
+15. Is there only one image?
+
+If the image has a clear technical defect, a targeted correction may be
+attempted.
+
+Do not repeatedly regenerate an image that has been rejected by content
+moderation.
+
+---
+
+# 22. OUTPUT
+
+Successful generation:
+
+{
+  "status": "generated",
+  "description": "...",
+  "image": "..."
+}
+
+Moderated generation:
+
+{
+  "status": "moderated",
+  "reason": "xai_content_moderation",
+  "retryable": false,
+  "description": "The image-generation provider rejected this generation request through its content-moderation system.",
+  "image": null
+}
+
+Technical failure:
+
+{
+  "status": "failed",
+  "reason": "provider_error",
+  "retryable": true,
+  "description": "...",
+  "image": null
+}
+
+---
+
+# 23. FINAL PRINCIPLE
+
+The goal is not:
+
+"Generate an attractive AI woman."
+
+The goal is:
+
+"Generate another believable photograph of Aparna wearing the
+selected canonical wardrobe item in her established environment."
+
+Identity consistency > garment accuracy > environmental continuity >
+photographic realism > aesthetic perfection.
