@@ -1,45 +1,33 @@
 import { NextResponse } from "next/server";
-import { saveWardrobeItem } from "@/lib/wardrobe";
+import {
+  saveUploadedWardrobeItem,
+} from "@/lib/wardrobe";
 
 export const runtime = "nodejs";
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const body = await request.json();
-
-    const product = body?.product;
+    const body =
+      await request.json();
 
     const name =
       typeof body?.name === "string"
         ? body.name.trim()
         : "";
 
-    const imageTags = Array.isArray(body?.imageTags)
-      ? body.imageTags
-      : [];
+    const upload =
+      body?.upload;
 
-    if (!product) {
-      return NextResponse.json(
-        {
-          error: "Product information is required.",
-        },
-        { status: 400 }
-      );
-    }
-
-    if (!product.productUrl) {
-      return NextResponse.json(
-        {
-          error: "Product URL is required.",
-        },
-        { status: 400 }
-      );
-    }
+    const analysis =
+      body?.analysis;
 
     if (!name) {
       return NextResponse.json(
         {
-          error: "Wardrobe item name is required.",
+          error:
+            "Wardrobe item name is required.",
         },
         { status: 400 }
       );
@@ -55,20 +43,39 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!imageTags.length) {
+    if (
+      !upload ||
+      typeof upload.id !== "string" ||
+      typeof upload.local_path !== "string"
+    ) {
       return NextResponse.json(
         {
-          error: "At least one product image is required.",
+          error:
+            "Uploaded wardrobe reference is required.",
         },
         { status: 400 }
       );
     }
 
-    const item = await saveWardrobeItem(
-      product,
-      imageTags,
-      name
-    );
+    if (
+      !analysis ||
+      typeof analysis !== "object"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Garment analysis is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const item =
+      await saveUploadedWardrobeItem(
+        name,
+        upload,
+        analysis
+      );
 
     return NextResponse.json({
       status: "added",
@@ -76,7 +83,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error(
-      "WARDROBE ADD ERROR:",
+      "WARDROBE UPLOAD ADD ERROR:",
       error
     );
 

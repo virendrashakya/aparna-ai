@@ -53,22 +53,10 @@ const reelStyles = [
   "resort_glam",
 ];
 
-const videoDurations = [
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  12,
-  15,
-];
-
-const videoResolutions = [
-  "480p",
-  "720p",
-  "1080p",
-];
+type WearingIntent = {
+  id: string;
+  name: string;
+};
 
 type WardrobeItem = {
   id: string;
@@ -81,6 +69,7 @@ type WardrobeItem = {
     back?: string | null;
     detail?: string | null;
   };
+  wearing_intents?: WearingIntent[];
   status: string;
 };
 
@@ -93,6 +82,9 @@ export default function Home() {
 
   const [outfit, setOutfit] =
     useState("");
+
+  const [wearingIntent, setWearingIntent] =
+    useState("default");
 
   const [location, setLocation] =
     useState("Living room");
@@ -108,14 +100,8 @@ export default function Home() {
   const [thirstLevel, setThirstLevel] =
     useState(4);
 
-  const [videoDuration, setVideoDuration] =
+  const [reelDuration, setReelDuration] =
     useState(8);
-
-  const [videoResolution, setVideoResolution] =
-    useState("720p");
-
-  const [generateAudio, setGenerateAudio] =
-    useState(false);
 
   const [wardrobe, setWardrobe] =
     useState<WardrobeItem[]>([]);
@@ -132,10 +118,8 @@ export default function Home() {
   const [loadingVideo, setLoadingVideo] =
     useState(false);
 
-  const [
-    loadingWardrobe,
-    setLoadingWardrobe,
-  ] = useState(true);
+  const [loadingWardrobe, setLoadingWardrobe] =
+    useState(true);
 
   const [error, setError] =
     useState("");
@@ -169,8 +153,11 @@ export default function Home() {
       setWardrobe(items);
 
       if (
-        !outfit &&
-        items.length > 0
+        items.length > 0 &&
+        !items.some(
+          (item: WardrobeItem) =>
+            item.id === outfit
+        )
       ) {
         setOutfit(
           items[0].id
@@ -190,6 +177,36 @@ export default function Home() {
   useEffect(() => {
     loadWardrobe();
   }, []);
+
+  const selectedWardrobeItem =
+    wardrobe.find(
+      (item) =>
+        item.id === outfit
+    );
+
+  useEffect(() => {
+    const intents =
+      selectedWardrobeItem
+        ?.wearing_intents ||
+      [];
+
+    if (
+      wearingIntent !==
+        "default" &&
+      !intents.some(
+        (item) =>
+          item.id === wearingIntent
+      )
+    ) {
+      setWearingIntent(
+        "default"
+      );
+    }
+  }, [
+    outfit,
+    selectedWardrobeItem,
+    wearingIntent,
+  ]);
 
   async function generateImage() {
     if (!outfit) {
@@ -222,6 +239,10 @@ export default function Home() {
               mood,
               outfit_id:
                 outfit,
+
+              wearing_intent_id:
+                wearingIntent,
+
               location,
               shot,
 
@@ -261,7 +282,7 @@ export default function Home() {
     }
   }
 
-  async function generateVideo() {
+  async function generateReel() {
     if (!image) {
       setError(
         "Generate the Aparna frame first."
@@ -296,22 +317,17 @@ export default function Home() {
                 thirstLevel,
 
               duration:
-                videoDuration,
-
-              resolution:
-                videoResolution,
-
-              aspect_ratio:
-                "9:16",
-
-              generate_audio:
-                generateAudio,
+                reelDuration,
 
               location,
-
               mood,
-
               shot,
+
+              outfit_id:
+                outfit,
+
+              wearing_intent_id:
+                wearingIntent,
             }),
           }
         );
@@ -322,7 +338,7 @@ export default function Home() {
       if (!response.ok) {
         throw new Error(
           data.error ||
-            "Video generation failed"
+            "Reel generation failed"
         );
       }
 
@@ -333,7 +349,7 @@ export default function Home() {
       setError(
         error instanceof Error
           ? error.message
-          : "Video generation failed."
+          : "Reel generation failed."
       );
     } finally {
       setLoadingVideo(false);
@@ -344,6 +360,11 @@ export default function Home() {
     loadingImage ||
     loadingVideo;
 
+  const intents =
+    selectedWardrobeItem
+      ?.wearing_intents ||
+    [];
+
   return (
     <main className="app">
       <header className="header">
@@ -353,13 +374,13 @@ export default function Home() {
           </div>
 
           <h1>
-            Video Studio
+            Generate Aparna
           </h1>
         </div>
 
         <div className="status">
           <span className="status-dot" />
-          GROK IMAGINE VIDEO 1.5
+          OPENCLAW + GROK VIDEO
         </div>
       </header>
 
@@ -367,93 +388,15 @@ export default function Home() {
         <section className="controls">
           <div className="control">
             <label>
-              VIDEO MODEL
+              CONTENT
             </label>
 
             <select
-              value="grok-imagine-video-1.5"
+              value="reel"
               disabled
             >
-              <option>
-                GROK IMAGINE VIDEO 1.5
-              </option>
-            </select>
-
-            <small>
-              Image-to-video · exact first
-              frame
-            </small>
-          </div>
-
-          <div className="control">
-            <label>
-              ASPECT RATIO
-            </label>
-
-            <select
-              value="9:16"
-              disabled
-            >
-              <option>
-                9:16 — VERTICAL
-              </option>
-            </select>
-          </div>
-
-          <div className="control">
-            <label>
-              RESOLUTION
-            </label>
-
-            <select
-              value={videoResolution}
-              onChange={(event) =>
-                setVideoResolution(
-                  event.target.value
-                )
-              }
-            >
-              {videoResolutions.map(
-                (resolution) => (
-                  <option
-                    key={resolution}
-                    value={resolution}
-                  >
-                    {resolution.toUpperCase()}
-                  </option>
-                )
-              )}
-            </select>
-
-            <small>
-              720p recommended for testing
-            </small>
-          </div>
-
-          <div className="control">
-            <label>
-              VIDEO AUDIO
-            </label>
-
-            <select
-              value={
-                generateAudio
-                  ? "on"
-                  : "off"
-              }
-              onChange={(event) =>
-                setGenerateAudio(
-                  event.target.value ===
-                    "on"
-                )
-              }
-            >
-              <option value="off">
-                SILENT VIDEO
-              </option>
-
-              <option value="on">
-                GENERATE AUDIO
+              <option value="reel">
+                INSTAGRAM REEL
               </option>
             </select>
           </div>
@@ -519,20 +462,29 @@ export default function Home() {
 
           <div className="control">
             <label>
-              VIDEO LENGTH
+              REEL LENGTH
             </label>
 
             <select
-              value={videoDuration}
+              value={reelDuration}
               onChange={(event) =>
-                setVideoDuration(
+                setReelDuration(
                   Number(
                     event.target.value
                   )
                 )
               }
             >
-              {videoDurations.map(
+              {[
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                12,
+                15,
+              ].map(
                 (seconds) => (
                   <option
                     key={seconds}
@@ -597,7 +549,7 @@ export default function Home() {
 
           <div className="control">
             <label>
-              DRESS
+              GARMENT
             </label>
 
             <select
@@ -637,6 +589,48 @@ export default function Home() {
                 )
               )}
             </select>
+          </div>
+
+          <div className="control">
+            <label>
+              HOW IT IS WORN
+            </label>
+
+            <select
+              value={wearingIntent}
+              onChange={(event) =>
+                setWearingIntent(
+                  event.target.value
+                )
+              }
+              disabled={
+                !selectedWardrobeItem
+              }
+            >
+              <option value="default">
+                Default garment styling
+              </option>
+
+              {intents.map(
+                (intent) => (
+                  <option
+                    key={intent.id}
+                    value={intent.id}
+                  >
+                    {intent.name}
+                  </option>
+                )
+              )}
+            </select>
+
+            {wearingIntent !==
+              "default" && (
+              <small>
+                Using the saved styling
+                reference, not just the
+                garment.
+              </small>
+            )}
           </div>
 
           <div className="wardrobe-add-wrapper">
@@ -709,14 +703,14 @@ export default function Home() {
           >
             {loadingImage
               ? "CREATING FRAME..."
-              : "✦ GENERATE VIDEO FRAME"}
+              : "✦ GENERATE REEL FRAME"}
           </button>
 
           {image && (
             <button
               className="generate-button"
               onClick={
-                generateVideo
+                generateReel
               }
               disabled={
                 busy
@@ -724,7 +718,7 @@ export default function Home() {
             >
               {loadingVideo
                 ? "GENERATING VIDEO..."
-                : "▶ GENERATE VIDEO"}
+                : "▶ GENERATE REEL"}
             </button>
           )}
         </section>
@@ -740,21 +734,18 @@ export default function Home() {
                 </div>
 
                 <h2>
-                  Video mode ready
+                  Ready to create
+                  Aparna
                 </h2>
 
                 <p>
-                  First generate a
-                  photorealistic Aparna
-                  frame.
-                </p>
-
-                <p>
-                  That exact frame is
-                  then sent to
-                  Grok Imagine Video
-                  1.5 as the first
-                  frame of the Reel.
+                  Upload real clothing
+                  references into her
+                  wardrobe, preserve how
+                  they are worn, then use
+                  the resolved look for
+                  image and video
+                  generation.
                 </p>
               </div>
             )}
@@ -764,13 +755,12 @@ export default function Home() {
               <div className="loader" />
 
               <h2>
-                Creating first frame...
+                Creating Aparna...
               </h2>
 
               <p>
-                Building the visual
-                identity that will be
-                animated.
+                Applying the garment
+                and its wearing intent.
               </p>
             </div>
           )}
@@ -784,24 +774,10 @@ export default function Home() {
               </h2>
 
               <p>
-                Grok Imagine Video 1.5
-                is creating your{" "}
-                {videoDuration}
-                -second Reel.
-              </p>
-
-              <p>
-                {videoResolution} ·
-                9:16 ·{" "}
-                {generateAudio
-                  ? "audio enabled"
-                  : "silent"}
-              </p>
-
-              <p>
-                Video generation is
-                asynchronous and can
-                take a few minutes.
+                Grok is turning the
+                approved frame into a{" "}
+                {reelDuration}-second
+                vertical Reel.
               </p>
             </div>
           )}
@@ -829,11 +805,11 @@ export default function Home() {
               <div className="result-info">
                 <div>
                   <span>
-                    GROK VIDEO
+                    REEL
                   </span>
 
                   <span>
-                    {videoDuration}s
+                    {reelDuration}s
                   </span>
 
                   <span>
@@ -841,13 +817,7 @@ export default function Home() {
                   </span>
 
                   <span>
-                    {videoResolution}
-                  </span>
-
-                  <span>
-                    {generateAudio
-                      ? "AUDIO"
-                      : "SILENT"}
+                    720p
                   </span>
 
                   <span>
@@ -855,18 +825,18 @@ export default function Home() {
                     {thirstLevel}/5
                   </span>
 
-                  <span>
-                    {reelStyle.replaceAll(
-                      "_",
-                      " "
-                    )}
-                  </span>
+                  {wearingIntent !==
+                    "default" && (
+                    <span>
+                      Styled reference
+                    </span>
+                  )}
                 </div>
 
                 <div className="result-actions">
                   <button
                     onClick={
-                      generateVideo
+                      generateReel
                     }
                     disabled={
                       loadingVideo
@@ -889,27 +859,30 @@ export default function Home() {
               <div className="result">
                 <img
                   src={image}
-                  alt="Aparna video first frame"
+                  alt="Aparna Reel first frame"
                 />
 
                 <div className="result-info">
                   <div>
                     <span>
-                      VIDEO FIRST FRAME
-                    </span>
-
-                    <span>
-                      9:16
-                    </span>
-
-                    <span>
-                      {videoResolution}
+                      REEL FRAME
                     </span>
 
                     <span>
                       Thirst{" "}
                       {thirstLevel}/5
                     </span>
+
+                    <span>
+                      9:16
+                    </span>
+
+                    {wearingIntent !==
+                      "default" && (
+                      <span>
+                        Styled reference
+                      </span>
+                    )}
                   </div>
 
                   <div className="result-actions">
@@ -927,7 +900,7 @@ export default function Home() {
                     <button
                       className="approve"
                       onClick={
-                        generateVideo
+                        generateReel
                       }
                     >
                       ▶ GENERATE VIDEO

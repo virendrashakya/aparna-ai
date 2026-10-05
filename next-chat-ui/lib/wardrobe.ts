@@ -61,35 +61,53 @@ function slugify(value: string) {
     .slice(0, 50);
 }
 
-function getExtension(url: string) {
-  try {
-    const pathname = new URL(url).pathname;
-    const extension = path.extname(pathname);
+function cleanText(value: unknown) {
+  if (typeof value !== "string") {
+    return null;
+  }
 
-    if (
-      [".jpg", ".jpeg", ".png", ".webp"].includes(
-        extension.toLowerCase()
-      )
-    ) {
-      return extension.toLowerCase();
-    }
-  } catch {}
+  const cleaned =
+    value
+      .replace(/\s+/g, " ")
+      .trim();
+
+  return cleaned || null;
+}
+
+function getExtension(
+  filename: string
+) {
+  const extension =
+    path.extname(filename);
+
+  if (
+    [".jpg", ".jpeg", ".png", ".webp"].includes(
+      extension.toLowerCase()
+    )
+  ) {
+    return extension.toLowerCase();
+  }
 
   return ".jpg";
 }
 
-function detectRetailer(url: string) {
+function detectRetailer(
+  url: string
+) {
   try {
-    const hostname = new URL(url)
-      .hostname
-      .toLowerCase()
-      .replace(/^www\./, "");
+    const hostname =
+      new URL(url)
+        .hostname
+        .toLowerCase()
+        .replace(/^www\./, "");
 
     return (
       ALLOWED_RETAILERS.find(
         (domain) =>
           hostname === domain ||
-          hostname.endsWith(`.${domain}`)
+          hostname.endsWith(
+            `.${domain}`
+          )
       ) || null
     );
   } catch {
@@ -97,26 +115,15 @@ function detectRetailer(url: string) {
   }
 }
 
-function cleanText(value: unknown) {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const cleaned = value
-    .replace(/\s+/g, " ")
-    .trim();
-
-  return cleaned || null;
-}
-
 function extractMeta(
   html: string,
   property: string
 ) {
-  const escaped = property.replace(
-    /[-/\\^$*+?.()|[\]{}]/g,
-    "\\$&"
-  );
+  const escaped =
+    property.replace(
+      /[-/\\^$*+?.()|[\]{}]/g,
+      "\\$&"
+    );
 
   const patterns = [
     new RegExp(
@@ -138,12 +145,16 @@ function extractMeta(
   ];
 
   for (const pattern of patterns) {
-    const match = html.match(pattern);
+    const match =
+      html.match(pattern);
 
     if (match?.[1]) {
       return match[1]
         .replace(/&amp;/g, "&")
-        .replace(/&quot;/g, '"')
+        .replace(
+          /&quot;/g,
+          '"'
+        )
         .trim();
     }
   }
@@ -151,7 +162,9 @@ function extractMeta(
   return null;
 }
 
-function extractJsonLd(html: string) {
+function extractJsonLd(
+  html: string
+) {
   const scripts = [
     ...html.matchAll(
       /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
@@ -162,7 +175,10 @@ function extractJsonLd(html: string) {
 
   for (const match of scripts) {
     try {
-      const parsed = JSON.parse(match[1].trim());
+      const parsed =
+        JSON.parse(
+          match[1].trim()
+        );
 
       if (Array.isArray(parsed)) {
         results.push(...parsed);
@@ -186,7 +202,8 @@ function findProductSchema(
 
   if (Array.isArray(value)) {
     for (const item of value) {
-      const result = findProductSchema(item);
+      const result =
+        findProductSchema(item);
 
       if (result) {
         return result;
@@ -196,14 +213,20 @@ function findProductSchema(
     return null;
   }
 
-  if (typeof value !== "object") {
+  if (
+    typeof value !== "object"
+  ) {
     return null;
   }
 
   const object =
-    value as Record<string, any>;
+    value as Record<
+      string,
+      any
+    >;
 
-  const type = object["@type"];
+  const type =
+    object["@type"];
 
   if (
     type === "Product" ||
@@ -214,13 +237,9 @@ function findProductSchema(
   }
 
   if (object["@graph"]) {
-    const result = findProductSchema(
+    return findProductSchema(
       object["@graph"]
     );
-
-    if (result) {
-      return result;
-    }
   }
 
   return null;
@@ -246,78 +265,46 @@ function absoluteUrl(
 
 function extractImages(
   html: string,
-  product: any,
+  schema: any,
   productUrl: string
 ) {
   const images: string[] = [];
 
-  function addImage(value: unknown) {
+  const addImage = (
+    value: unknown
+  ) => {
     if (
-      typeof value !== "string" ||
-      !value.trim()
+      typeof value !== "string"
     ) {
       return;
     }
 
-    const url = absoluteUrl(
-      value.trim(),
-      productUrl
+    const absolute =
+      absoluteUrl(
+        value,
+        productUrl
+      );
+
+    if (
+      absolute &&
+      !images.includes(
+        absolute
+      )
+    ) {
+      images.push(absolute);
+    }
+  };
+
+  const schemaImages =
+    schema?.image;
+
+  if (Array.isArray(schemaImages)) {
+    schemaImages.forEach(
+      addImage
     );
-
-    if (!url || images.includes(url)) {
-      return;
-    }
-
-    images.push(url);
+  } else {
+    addImage(schemaImages);
   }
-
-  function processImage(value: unknown) {
-    if (typeof value === "string") {
-      addImage(value);
-      return;
-    }
-
-    if (Array.isArray(value)) {
-      value.forEach(processImage);
-      return;
-    }
-
-    if (
-      value &&
-      typeof value === "object"
-    ) {
-      const image =
-        value as Record<string, unknown>;
-
-      addImage(
-        typeof image.url === "string"
-          ? image.url
-          : null
-      );
-
-      addImage(
-        typeof image.contentUrl === "string"
-          ? image.contentUrl
-          : null
-      );
-    }
-  }
-
-  processImage(product?.image);
-
-  addImage(
-    extractMeta(
-      html,
-      "og:image"
-    )
-  );
-
-  addImage(
-    extractMeta(
-      html,
-      "twitter:image"
-    )
-  );
 
   const imageRegex =
     /https?:\/\/[^"'<>\\\s]+?\.(?:jpg|jpeg|png|webp)(?:\?[^"'<>\\\s]*)?/gi;
@@ -325,9 +312,14 @@ function extractImages(
   const matches =
     html.match(imageRegex) || [];
 
-  matches.forEach(addImage);
+  matches.forEach(
+    addImage
+  );
 
-  return images.slice(0, 8);
+  return images.slice(
+    0,
+    8
+  );
 }
 
 function inferCategory(
@@ -339,27 +331,39 @@ function inferCategory(
       name || ""
     }`.toLowerCase();
 
-  if (value.includes("dress")) {
+  if (
+    value.includes("dress")
+  ) {
     return "dress";
   }
 
-  if (value.includes("saree")) {
+  if (
+    value.includes("saree")
+  ) {
     return "saree";
   }
 
-  if (value.includes("blouse")) {
+  if (
+    value.includes("blouse")
+  ) {
     return "blouse";
   }
 
-  if (value.includes("top")) {
+  if (
+    value.includes("top")
+  ) {
     return "top";
   }
 
-  if (value.includes("shirt")) {
+  if (
+    value.includes("shirt")
+  ) {
     return "shirt";
   }
 
-  if (value.includes("skirt")) {
+  if (
+    value.includes("skirt")
+  ) {
     return "skirt";
   }
 
@@ -374,30 +378,33 @@ function inferCategory(
   return "clothing";
 }
 
-/**
- * Fetch product information from a retailer URL.
- */
 export async function fetchProduct(
   productUrl: string
 ): Promise<WardrobeProduct> {
   let parsedUrl: URL;
 
   try {
-    parsedUrl = new URL(productUrl);
+    parsedUrl =
+      new URL(productUrl);
   } catch {
     throw new Error(
       "Invalid product URL."
     );
   }
 
-  if (parsedUrl.protocol !== "https:") {
+  if (
+    parsedUrl.protocol !==
+    "https:"
+  ) {
     throw new Error(
       "Only HTTPS product URLs are supported."
     );
   }
 
   const retailer =
-    detectRetailer(productUrl);
+    detectRetailer(
+      productUrl
+    );
 
   if (!retailer) {
     throw new Error(
@@ -405,20 +412,21 @@ export async function fetchProduct(
     );
   }
 
-  const response = await fetch(
-    productUrl,
-    {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language":
-          "en-US,en;q=0.9",
-      },
-      cache: "no-store",
-    }
-  );
+  const response =
+    await fetch(
+      productUrl,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
+          Accept:
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+          "Accept-Language":
+            "en-US,en;q=0.9",
+        },
+        cache: "no-store",
+      }
+    );
 
   if (!response.ok) {
     throw new Error(
@@ -426,34 +434,48 @@ export async function fetchProduct(
     );
   }
 
-  const html = await response.text();
+  const html =
+    await response.text();
 
-  const jsonLd = extractJsonLd(html);
+  const jsonLd =
+    extractJsonLd(html);
 
-  const schema = jsonLd
-    .map(findProductSchema)
-    .find(Boolean);
+  const schema =
+    jsonLd
+      .map(
+        findProductSchema
+      )
+      .find(Boolean);
 
   const name =
     cleanText(schema?.name) ||
     cleanText(
-      extractMeta(html, "og:title")
+      extractMeta(
+        html,
+        "og:title"
+      )
     ) ||
     cleanText(
-      extractMeta(html, "twitter:title")
+      extractMeta(
+        html,
+        "twitter:title"
+      )
     );
 
-  const brand = cleanText(
-    typeof schema?.brand === "string"
-      ? schema.brand
-      : schema?.brand?.name
-  );
+  const brand =
+    cleanText(
+      typeof schema?.brand ===
+        "string"
+        ? schema.brand
+        : schema?.brand?.name
+    );
 
-  const images = extractImages(
-    html,
-    schema,
-    productUrl
-  );
+  const images =
+    extractImages(
+      html,
+      schema,
+      productUrl
+    );
 
   if (!images.length) {
     throw new Error(
@@ -463,12 +485,9 @@ export async function fetchProduct(
 
   const productId =
     cleanText(schema?.sku) ||
-    cleanText(schema?.productID);
-
-  const category = inferCategory(
-    schema,
-    name
-  );
+    cleanText(
+      schema?.productID
+    );
 
   return {
     retailer,
@@ -476,17 +495,26 @@ export async function fetchProduct(
     productUrl,
     name,
     brand,
-    category,
-    color: cleanText(schema?.color),
+    category:
+      inferCategory(
+        schema,
+        name
+      ),
+    color:
+      cleanText(
+        schema?.color
+      ),
     fit: null,
     length: null,
     details: [],
-    images: images.map(
-      (url, index) => ({
-        id: `image_${index + 1}`,
-        url,
-      })
-    ),
+    images:
+      images.map(
+        (url, index) => ({
+          id:
+            `image_${index + 1}`,
+          url,
+        })
+      ),
   };
 }
 
@@ -504,8 +532,9 @@ function getTagFilename(
   ];
 
   return (
-    priority.find((tag) =>
-      tags.includes(tag)
+    priority.find(
+      (tag) =>
+        tags.includes(tag)
     ) || null
   );
 }
@@ -514,17 +543,18 @@ async function downloadImage(
   url: string,
   destination: string
 ) {
-  const response = await fetch(
-    url,
-    {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
-        Accept:
-          "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
-      },
-    }
-  );
+  const response =
+    await fetch(
+      url,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/153 Safari/537.36",
+          Accept:
+            "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+        },
+      }
+    );
 
   if (!response.ok) {
     throw new Error(
@@ -532,9 +562,10 @@ async function downloadImage(
     );
   }
 
-  const buffer = Buffer.from(
-    await response.arrayBuffer()
-  );
+  const buffer =
+    Buffer.from(
+      await response.arrayBuffer()
+    );
 
   await fs.writeFile(
     destination,
@@ -556,7 +587,9 @@ export async function saveWardrobeItem(
     );
   }
 
-  if (wardrobeName.length > 100) {
+  if (
+    wardrobeName.length > 100
+  ) {
     throw new Error(
       "Wardrobe item name must be 100 characters or less."
     );
@@ -569,12 +602,10 @@ export async function saveWardrobeItem(
     }
   );
 
-  /*
-   * Use the custom wardrobe name for the
-   * canonical item directory ID.
-   */
   const itemId =
-    `${slugify(wardrobeName)}_${createId().slice(0, 8)}`;
+    `${slugify(
+      wardrobeName
+    )}_${createId().slice(0, 8)}`;
 
   const itemDirectory =
     path.join(
@@ -589,20 +620,22 @@ export async function saveWardrobeItem(
     }
   );
 
-  const visualReference: Record<
-    string,
-    string | null
-  > = {
-    front: null,
-    back: null,
-    side: null,
-    closeup_front: null,
-    closeup_back: null,
-    closeup_side: null,
-    dress_only: null,
-  };
+  const visualReference:
+    Record<
+      string,
+      string | null
+    > = {
+      front: null,
+      back: null,
+      side: null,
+      closeup_front: null,
+      closeup_back: null,
+      closeup_side: null,
+      dress_only: null,
+    };
 
-  const savedImages: any[] = [];
+  const savedImages: any[] =
+    [];
 
   for (
     let index = 0;
@@ -617,15 +650,21 @@ export async function saveWardrobeItem(
     }
 
     const extension =
-      getExtension(image.url);
+      getExtension(
+        image.url
+      );
 
     const tags =
-      Array.isArray(image.tags)
+      Array.isArray(
+        image.tags
+      )
         ? image.tags
         : [];
 
     const primaryTag =
-      getTagFilename(tags);
+      getTagFilename(
+        tags
+      );
 
     const filename =
       primaryTag
@@ -650,20 +689,19 @@ export async function saveWardrobeItem(
             WORKSPACE,
             destination
           )
-          .split(path.sep)
+          .split(
+            path.sep
+          )
           .join("/");
 
       savedImages.push({
         id:
           image.id ||
           `image_${index + 1}`,
-
         source_url:
           image.url,
-
         local_path:
           relativePath,
-
         tags,
       });
 
@@ -694,63 +732,41 @@ export async function saveWardrobeItem(
 
   const wardrobeItem = {
     id: itemId,
-
-    /*
-     * User-defined canonical wardrobe name.
-     */
     name: wardrobeName,
 
     source: {
+      type: "retailer",
       retailer:
         product.retailer ||
         null,
-
       product_id:
         product.productId ||
         null,
-
       url:
         product.productUrl ||
         null,
     },
 
     garment: {
-      /*
-       * Keep garment.name aligned with the
-       * user's canonical wardrobe name so
-       * downstream image/content systems use
-       * the name the user chose.
-       */
       name: wardrobeName,
-
-      /*
-       * Preserve the retailer's original
-       * product name separately.
-       */
       original_name:
         product.name ||
         null,
-
       brand:
         product.brand ||
         null,
-
       category:
         product.category ||
         "clothing",
-
       color:
         product.color ||
         null,
-
       fit:
         product.fit ||
         null,
-
       length:
         product.length ||
         null,
-
       details:
         Array.isArray(
           product.details
@@ -758,6 +774,8 @@ export async function saveWardrobeItem(
           ? product.details
           : [],
     },
+
+    wearing_intents: [],
 
     visual_reference:
       visualReference,
@@ -794,6 +812,377 @@ export async function saveWardrobeItem(
     "utf8"
   );
 
+  return appendWardrobeItem(
+    wardrobeItem
+  );
+}
+
+export async function saveUploadedWardrobeItem(
+  customName: string,
+  upload: {
+    id: string;
+    local_path: string;
+    filename: string;
+    mime_type?: string;
+    size?: number;
+  },
+  analysis: any
+) {
+  const wardrobeName =
+    customName.trim();
+
+  if (!wardrobeName) {
+    throw new Error(
+      "Wardrobe item name is required."
+    );
+  }
+
+  if (
+    wardrobeName.length > 100
+  ) {
+    throw new Error(
+      "Wardrobe item name must be 100 characters or less."
+    );
+  }
+
+  const sourcePath =
+    path.resolve(
+      WORKSPACE,
+      upload.local_path
+    );
+
+  const uploadDirectory =
+    path.resolve(
+      WORKSPACE,
+      "wardrobe",
+      "_uploads"
+    );
+
+  const relativeUploadDirectory =
+    `${uploadDirectory}${path.sep}`;
+
+  if (
+    !sourcePath.startsWith(
+      relativeUploadDirectory
+    )
+  ) {
+    throw new Error(
+      "Invalid wardrobe upload reference."
+    );
+  }
+
+  try {
+    await fs.access(
+      sourcePath
+    );
+  } catch {
+    throw new Error(
+      "The uploaded wardrobe reference could not be found."
+    );
+  }
+
+  const itemId =
+    `${slugify(
+      wardrobeName
+    )}_${createId().slice(0, 8)}`;
+
+  const itemDirectory =
+    path.join(
+      WARDROBE_DIRECTORY,
+      itemId
+    );
+
+  const sourceDirectory =
+    path.join(
+      itemDirectory,
+      "source"
+    );
+
+  await fs.mkdir(
+    sourceDirectory,
+    {
+      recursive: true,
+    }
+  );
+
+  const extension =
+    getExtension(
+      upload.filename
+    );
+
+  const sourceDestination =
+    path.join(
+      sourceDirectory,
+      `reference${extension}`
+    );
+
+  await fs.copyFile(
+    sourcePath,
+    sourceDestination
+  );
+
+  const sourceRelativePath =
+    path
+      .relative(
+        WORKSPACE,
+        sourceDestination
+      )
+      .split(
+        path.sep
+      )
+      .join("/");
+
+  const garment =
+    analysis?.garment || {};
+
+  const wearingIntent =
+    analysis?.wearing_intent ||
+    {};
+
+  const item = {
+    id: itemId,
+
+    name: wardrobeName,
+
+    source: {
+      type: "uploaded_photo",
+      upload_id:
+        upload.id,
+      original_filename:
+        upload.filename ||
+        null,
+      mime_type:
+        upload.mime_type ||
+        null,
+    },
+
+    garment: {
+      name:
+        garment.name ||
+        wardrobeName,
+
+      type:
+        garment.type ||
+        "clothing",
+
+      subtype:
+        garment.subtype ||
+        null,
+
+      color:
+        garment.color ||
+        null,
+
+      secondary_colors:
+        Array.isArray(
+          garment.secondary_colors
+        )
+          ? garment.secondary_colors
+          : [],
+
+      material:
+        garment.material ||
+        null,
+
+      pattern:
+        garment.pattern ||
+        null,
+
+      construction:
+        Array.isArray(
+          garment.construction
+        )
+          ? garment.construction
+          : [],
+
+      fit:
+        garment.fit ||
+        null,
+
+      length:
+        garment.length ||
+        null,
+
+      neckline:
+        garment.neckline ||
+        null,
+
+      sleeves:
+        garment.sleeves ||
+        null,
+
+      straps:
+        garment.straps ||
+        null,
+
+      details:
+        Array.isArray(
+          garment.details
+        )
+          ? garment.details
+          : [],
+    },
+
+    wearing_intents: [
+      {
+        id: "reference_01",
+
+        name:
+          wearingIntent.name ||
+          "Reference styling",
+
+        description:
+          wearingIntent.description ||
+          null,
+
+        waist_position:
+          wearingIntent.waist_position ||
+          null,
+
+        garment_position:
+          wearingIntent.garment_position ||
+          null,
+
+        fit:
+          wearingIntent.fit ||
+          null,
+
+        silhouette:
+          wearingIntent.silhouette ||
+          null,
+
+        neckline_position:
+          wearingIntent.neckline_position ||
+          null,
+
+        sleeve_position:
+          wearingIntent.sleeve_position ||
+          null,
+
+        tuck:
+          wearingIntent.tuck ||
+          null,
+
+        drape:
+          wearingIntent.drape ||
+          null,
+
+        layering:
+          wearingIntent.layering ||
+          null,
+
+        fastening:
+          wearingIntent.fastening ||
+          null,
+
+        exposure_intent:
+          wearingIntent.exposure_intent ||
+          null,
+
+        preserve:
+          Array.isArray(
+            wearingIntent.preserve
+          )
+            ? wearingIntent.preserve
+            : [],
+
+        constraints:
+          Array.isArray(
+            wearingIntent.constraints
+          )
+            ? wearingIntent.constraints
+            : [],
+
+        accessories:
+          Array.isArray(
+            wearingIntent.accessories
+          )
+            ? wearingIntent.accessories
+            : [],
+
+        reference_image:
+          sourceRelativePath,
+      },
+    ],
+
+    visual_reference: {
+      source:
+        sourceRelativePath,
+    },
+
+    images: [
+      {
+        id: "reference_01",
+        local_path:
+          sourceRelativePath,
+        role:
+          "wearing_and_garment_reference",
+      },
+    ],
+
+    analysis: {
+      confidence:
+        typeof analysis?.confidence ===
+        "number"
+          ? analysis.confidence
+          : null,
+
+      notes:
+        Array.isArray(
+          analysis?.notes
+        )
+          ? analysis.notes
+          : [],
+    },
+
+    aparna: {
+      status: "available",
+      public_content: true,
+    },
+
+    usage: {
+      times_worn: 0,
+      times_posted: 0,
+      last_worn: null,
+      last_posted: null,
+    },
+
+    created_at:
+      new Date().toISOString(),
+  };
+
+  await fs.writeFile(
+    path.join(
+      itemDirectory,
+      "item.json"
+    ),
+    JSON.stringify(
+      item,
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  await appendWardrobeItem(
+    item
+  );
+
+  // The temporary upload is no longer needed.
+  try {
+    await fs.unlink(
+      sourcePath
+    );
+  } catch {
+    // Ignore cleanup failure.
+  }
+
+  return item;
+}
+
+async function appendWardrobeItem(
+  item: any
+) {
   let wardrobe: any = {
     items: [],
   };
@@ -806,7 +1195,9 @@ export async function saveWardrobeItem(
       );
 
     wardrobe =
-      JSON.parse(existing);
+      JSON.parse(
+        existing
+      );
 
     if (
       !Array.isArray(
@@ -822,7 +1213,7 @@ export async function saveWardrobeItem(
   }
 
   wardrobe.items.push(
-    wardrobeItem
+    item
   );
 
   await fs.mkdir(
@@ -844,5 +1235,5 @@ export async function saveWardrobeItem(
     "utf8"
   );
 
-  return wardrobeItem;
+  return item;
 }
