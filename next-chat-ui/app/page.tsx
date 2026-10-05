@@ -53,6 +53,23 @@ const reelStyles = [
   "resort_glam",
 ];
 
+const videoDurations = [
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  12,
+  15,
+];
+
+const videoResolutions = [
+  "480p",
+  "720p",
+  "1080p",
+];
+
 type WardrobeItem = {
   id: string;
   name: string;
@@ -91,8 +108,14 @@ export default function Home() {
   const [thirstLevel, setThirstLevel] =
     useState(4);
 
-  const [reelDuration, setReelDuration] =
+  const [videoDuration, setVideoDuration] =
     useState(8);
+
+  const [videoResolution, setVideoResolution] =
+    useState("720p");
+
+  const [generateAudio, setGenerateAudio] =
+    useState(false);
 
   const [wardrobe, setWardrobe] =
     useState<WardrobeItem[]>([]);
@@ -201,10 +224,13 @@ export default function Home() {
                 outfit,
               location,
               shot,
+
               content_type:
                 "reel_cover",
+
               reel_style:
                 reelStyle,
+
               thirst_level:
                 thirstLevel,
             }),
@@ -221,7 +247,9 @@ export default function Home() {
         );
       }
 
-      setImage(data.image);
+      setImage(
+        data.image
+      );
     } catch (error) {
       setError(
         error instanceof Error
@@ -233,7 +261,7 @@ export default function Home() {
     }
   }
 
-  async function generateReel() {
+  async function generateVideo() {
     if (!image) {
       setError(
         "Generate the Aparna frame first."
@@ -260,14 +288,29 @@ export default function Home() {
 
             body: JSON.stringify({
               image,
+
               reel_style:
                 reelStyle,
+
               thirst_level:
                 thirstLevel,
+
               duration:
-                reelDuration,
+                videoDuration,
+
+              resolution:
+                videoResolution,
+
+              aspect_ratio:
+                "9:16",
+
+              generate_audio:
+                generateAudio,
+
               location,
+
               mood,
+
               shot,
             }),
           }
@@ -279,16 +322,18 @@ export default function Home() {
       if (!response.ok) {
         throw new Error(
           data.error ||
-            "Reel generation failed"
+            "Video generation failed"
         );
       }
 
-      setVideo(data.video);
+      setVideo(
+        data.video
+      );
     } catch (error) {
       setError(
         error instanceof Error
           ? error.message
-          : "Reel generation failed."
+          : "Video generation failed."
       );
     } finally {
       setLoadingVideo(false);
@@ -308,13 +353,13 @@ export default function Home() {
           </div>
 
           <h1>
-            Generate Aparna
+            Video Studio
           </h1>
         </div>
 
         <div className="status">
           <span className="status-dot" />
-          OPENCLAW + GROK VIDEO
+          GROK IMAGINE VIDEO 1.5
         </div>
       </header>
 
@@ -322,15 +367,93 @@ export default function Home() {
         <section className="controls">
           <div className="control">
             <label>
-              CONTENT
+              VIDEO MODEL
             </label>
 
             <select
-              value="reel"
+              value="grok-imagine-video-1.5"
               disabled
             >
-              <option value="reel">
-                INSTAGRAM REEL
+              <option>
+                GROK IMAGINE VIDEO 1.5
+              </option>
+            </select>
+
+            <small>
+              Image-to-video · exact first
+              frame
+            </small>
+          </div>
+
+          <div className="control">
+            <label>
+              ASPECT RATIO
+            </label>
+
+            <select
+              value="9:16"
+              disabled
+            >
+              <option>
+                9:16 — VERTICAL
+              </option>
+            </select>
+          </div>
+
+          <div className="control">
+            <label>
+              RESOLUTION
+            </label>
+
+            <select
+              value={videoResolution}
+              onChange={(event) =>
+                setVideoResolution(
+                  event.target.value
+                )
+              }
+            >
+              {videoResolutions.map(
+                (resolution) => (
+                  <option
+                    key={resolution}
+                    value={resolution}
+                  >
+                    {resolution.toUpperCase()}
+                  </option>
+                )
+              )}
+            </select>
+
+            <small>
+              720p recommended for testing
+            </small>
+          </div>
+
+          <div className="control">
+            <label>
+              VIDEO AUDIO
+            </label>
+
+            <select
+              value={
+                generateAudio
+                  ? "on"
+                  : "off"
+              }
+              onChange={(event) =>
+                setGenerateAudio(
+                  event.target.value ===
+                    "on"
+                )
+              }
+            >
+              <option value="off">
+                SILENT VIDEO
+              </option>
+
+              <option value="on">
+                GENERATE AUDIO
               </option>
             </select>
           </div>
@@ -396,20 +519,20 @@ export default function Home() {
 
           <div className="control">
             <label>
-              REEL LENGTH
+              VIDEO LENGTH
             </label>
 
             <select
-              value={reelDuration}
+              value={videoDuration}
               onChange={(event) =>
-                setReelDuration(
+                setVideoDuration(
                   Number(
                     event.target.value
                   )
                 )
               }
             >
-              {[5, 6, 7, 8, 9, 10, 12, 15].map(
+              {videoDurations.map(
                 (seconds) => (
                   <option
                     key={seconds}
@@ -586,14 +709,14 @@ export default function Home() {
           >
             {loadingImage
               ? "CREATING FRAME..."
-              : "✦ GENERATE REEL FRAME"}
+              : "✦ GENERATE VIDEO FRAME"}
           </button>
 
           {image && (
             <button
               className="generate-button"
               onClick={
-                generateReel
+                generateVideo
               }
               disabled={
                 busy
@@ -601,7 +724,7 @@ export default function Home() {
             >
               {loadingVideo
                 ? "GENERATING VIDEO..."
-                : "▶ GENERATE REEL"}
+                : "▶ GENERATE VIDEO"}
             </button>
           )}
         </section>
@@ -617,21 +740,21 @@ export default function Home() {
                 </div>
 
                 <h2>
-                  Ready to create
-                  Aparna
+                  Video mode ready
                 </h2>
 
                 <p>
-                  Generate a strong
-                  vertical fashion frame,
-                  then animate it into
-                  an Instagram Reel.
+                  First generate a
+                  photorealistic Aparna
+                  frame.
                 </p>
 
                 <p>
-                  The generated frame
-                  becomes the exact first
-                  frame of the video.
+                  That exact frame is
+                  then sent to
+                  Grok Imagine Video
+                  1.5 as the first
+                  frame of the Reel.
                 </p>
               </div>
             )}
@@ -641,12 +764,13 @@ export default function Home() {
               <div className="loader" />
 
               <h2>
-                Creating Aparna...
+                Creating first frame...
               </h2>
 
               <p>
-                Building the Reel's
-                first frame.
+                Building the visual
+                identity that will be
+                animated.
               </p>
             </div>
           )}
@@ -660,16 +784,24 @@ export default function Home() {
               </h2>
 
               <p>
-                Grok is turning the
-                still frame into a
-                {reelDuration}-second
-                vertical Reel.
+                Grok Imagine Video 1.5
+                is creating your{" "}
+                {videoDuration}
+                -second Reel.
               </p>
 
               <p>
-                This can take a little
-                longer than image
-                generation.
+                {videoResolution} ·
+                9:16 ·{" "}
+                {generateAudio
+                  ? "audio enabled"
+                  : "silent"}
+              </p>
+
+              <p>
+                Video generation is
+                asynchronous and can
+                take a few minutes.
               </p>
             </div>
           )}
@@ -697,11 +829,11 @@ export default function Home() {
               <div className="result-info">
                 <div>
                   <span>
-                    REEL
+                    GROK VIDEO
                   </span>
 
                   <span>
-                    {reelDuration}s
+                    {videoDuration}s
                   </span>
 
                   <span>
@@ -709,7 +841,13 @@ export default function Home() {
                   </span>
 
                   <span>
-                    720p
+                    {videoResolution}
+                  </span>
+
+                  <span>
+                    {generateAudio
+                      ? "AUDIO"
+                      : "SILENT"}
                   </span>
 
                   <span>
@@ -718,18 +856,17 @@ export default function Home() {
                   </span>
 
                   <span>
-                    {reelStyle
-                      .replaceAll(
-                        "_",
-                        " "
-                      )}
+                    {reelStyle.replaceAll(
+                      "_",
+                      " "
+                    )}
                   </span>
                 </div>
 
                 <div className="result-actions">
                   <button
                     onClick={
-                      generateReel
+                      generateVideo
                     }
                     disabled={
                       loadingVideo
@@ -752,22 +889,26 @@ export default function Home() {
               <div className="result">
                 <img
                   src={image}
-                  alt="Aparna Reel first frame"
+                  alt="Aparna video first frame"
                 />
 
                 <div className="result-info">
                   <div>
                     <span>
-                      REEL FRAME
+                      VIDEO FIRST FRAME
+                    </span>
+
+                    <span>
+                      9:16
+                    </span>
+
+                    <span>
+                      {videoResolution}
                     </span>
 
                     <span>
                       Thirst{" "}
                       {thirstLevel}/5
-                    </span>
-
-                    <span>
-                      9:16
                     </span>
                   </div>
 
@@ -786,7 +927,7 @@ export default function Home() {
                     <button
                       className="approve"
                       onClick={
-                        generateReel
+                        generateVideo
                       }
                     >
                       ▶ GENERATE VIDEO

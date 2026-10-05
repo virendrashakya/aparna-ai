@@ -5,13 +5,13 @@ import path from "path";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
-const XAI_API_KEY =
-  process.env.XAI_API_KEY;
-
-const XAI_VIDEO_MODEL =
-  "grok-imagine-video-1.5";
+const XAI_VIDEO_MODEL = "grok-imagine-video-1.5";
+const XAI_VIDEO_ENDPOINT =
+  "https://api.x.ai/v1/videos/generations";
 
 const DEFAULT_DURATION = 8;
+const DEFAULT_RESOLUTION = "720p";
+const DEFAULT_ASPECT_RATIO = "9:16";
 
 const VALID_DURATIONS = [
   5,
@@ -26,6 +26,24 @@ const VALID_DURATIONS = [
   14,
   15,
 ];
+
+const VALID_RESOLUTIONS = [
+  "480p",
+  "720p",
+  "1080p",
+] as const;
+
+const VALID_ASPECT_RATIOS = [
+  "9:16",
+  "16:9",
+  "1:1",
+] as const;
+
+type Resolution =
+  (typeof VALID_RESOLUTIONS)[number];
+
+type AspectRatio =
+  (typeof VALID_ASPECT_RATIOS)[number];
 
 function getThirstDescription(
   thirstLevel: number
@@ -70,7 +88,6 @@ attention-grabbing fashion movement
 very provocative fashion,
 substantially revealing but non-explicit styling,
 strong silhouette,
-intimate camera awareness,
 confident sensual fashion posing,
 deliberate attention-grabbing movement
 `;
@@ -99,17 +116,17 @@ function buildMotionPrompt({
   shot: string;
 }) {
   const thirst =
-    getThirstDescription(
-      thirstLevel
-    );
+    getThirstDescription(thirstLevel);
 
   return `
-Create a short vertical Instagram fashion Reel from the supplied
-first-frame image.
+Create a short vertical Instagram fashion Reel
+from the supplied first-frame image.
 
-The supplied image is the canonical first frame of Aparna Roy.
+The supplied image is the canonical first frame
+of Aparna Roy.
 
-Aparna is an adult fictional Indian fashion/lifestyle creator.
+Aparna is an adult fictional Indian
+fashion/lifestyle creator.
 
 REEL STYLE:
 ${reelStyle}
@@ -129,45 +146,56 @@ ${mood}
 SHOT:
 ${shot}
 
-IMPORTANT IDENTITY RULE:
+IDENTITY CONSISTENCY:
 
 The woman in the supplied image IS Aparna.
 
-Preserve her:
+Preserve exactly:
 
 - face
 - facial structure
 - eyes
 - nose
 - lips
-- skin
+- skin tone
 - hair
+- hairstyle
 - body identity
+- body proportions
 - age appearance
 - outfit
+- garment construction
 - jewellery
+- accessories
 - environment
 
 Do not transform her into another woman.
 
-Do not change the outfit.
+Do not change her face.
 
-Do not change the location.
+Do not change her body.
+
+Do not change her age.
+
+Do not change her hairstyle.
+
+Do not change the outfit.
 
 Do not redesign the garment.
 
-Do not alter her body proportions.
+Do not change the location.
 
-The video should feel like a real short social-media video captured
-from this exact photograph.
+The first frame must remain visually consistent
+with the supplied image.
 
 MOTION:
 
 Use subtle believable human movement.
 
-Good motion includes:
+Good movement includes:
 
 - natural breathing
+- blinking
 - slight posture adjustment
 - small head movement
 - natural eye movement
@@ -176,28 +204,29 @@ Good motion includes:
 - gentle hair movement
 - small body shift
 - natural fabric movement
-- slight saree/dress movement
+- slight saree or dress movement
 - tiny camera movement
 - subtle handheld phone motion
 - natural walking movement when appropriate
 
-For a fashion/thirst-trap Reel, the movement may include:
+For glamour fashion content:
 
-- slowly turning toward camera
+- slowly turn toward camera
 - small confident turn
 - slight shift of weight
 - gentle outfit movement
-- looking into camera
-- briefly looking away and returning eye contact
+- look into camera
+- briefly look away
+- return eye contact
 - subtle hair adjustment
 - small jewellery adjustment
 - natural fashion pose transition
 
-The movement should be confident and playful.
+The movement should feel like a real person.
 
-Do not make the movement explicit.
+Do not create exaggerated artificial movement.
 
-Do not depict sexual activity.
+Do not create explicit sexual activity.
 
 Do not depict pornography.
 
@@ -207,8 +236,8 @@ This is glamorous adult fashion content.
 
 CAMERA:
 
-Make it look like a real Instagram Reel captured with a modern
-smartphone.
+Make it look like a real Instagram Reel
+captured with a modern smartphone.
 
 Use:
 
@@ -220,11 +249,13 @@ Use:
 - realistic exposure
 - natural lighting
 - realistic shadows
+- realistic smartphone optics
 
 Avoid:
 
 - CGI movement
 - plastic skin
+- waxy skin
 - rubber body movement
 - unnatural limbs
 - warped hands
@@ -233,19 +264,14 @@ Avoid:
 - changing background
 - floating jewellery
 - impossible physics
-
-LOOP:
-
-Where possible, create a visually smooth ending that can transition
-back toward the opening frame.
-
-The Reel should feel like a deliberate 8-second fashion moment.
+- excessive cinematic camera movement
 
 SOCIAL MEDIA FEEL:
 
 This is not a movie scene.
 
-It should feel like a real creator filmed a short Instagram Reel.
+It should feel like a real creator
+filmed a short Instagram Reel.
 
 Keep the action simple.
 
@@ -253,19 +279,35 @@ The first frame is already strong.
 
 Do not introduce unnecessary characters.
 
+Do not add a second person.
+
 Do not add text.
+
+Do not add captions inside the video.
 
 Do not add logos.
 
 Do not add watermarks.
 
-Do not add a second person.
+Do not add UI elements.
+
+LOOP:
+
+Where possible, create a visually smooth ending
+that can transition naturally toward the opening frame.
 
 FINAL OBJECTIVE:
 
-A highly realistic short vertical Indian glamour fashion Reel where
-Aparna confidently acknowledges the camera and the outfit moves
-naturally.
+Create a highly realistic short vertical
+Indian glamour fashion Reel.
+
+Aparna confidently acknowledges the camera.
+
+Her clothing and jewellery move naturally.
+
+Her identity remains stable.
+
+The environment remains stable.
 
 The result should feel:
 
@@ -274,6 +316,7 @@ glamorous,
 flirtatious,
 real,
 social-media-native,
+photorealistic,
 and visually attention-grabbing.
 
 Not explicit.
@@ -285,46 +328,41 @@ Not artificial.
 async function imageToDataUri(
   imageUrl: string
 ) {
-  /*
-   * The browser gives us a local URL such as:
-   *
-   * /generated/aparna-123.png
-   *
-   * Convert that local generated image into a data URI because xAI
-   * accepts base64 image input.
-   */
-
   if (
     imageUrl.startsWith("data:image/")
   ) {
     return imageUrl;
   }
 
-  if (
-    !imageUrl.startsWith("/")
-  ) {
+  if (!imageUrl.startsWith("/")) {
     throw new Error(
       "Only local generated images are accepted."
     );
   }
 
-  const absolutePath =
-    path.join(
-      process.cwd(),
-      "public",
-      imageUrl
+  if (
+    imageUrl.includes("..") ||
+    imageUrl.includes("\\")
+  ) {
+    throw new Error(
+      "Invalid image path."
     );
+  }
 
-  const publicRoot =
-    path.resolve(
-      process.cwd(),
-      "public"
-    );
+  const publicRoot = path.resolve(
+    process.cwd(),
+    "public"
+  );
 
-  const resolvedPath =
-    path.resolve(
-      absolutePath
-    );
+  const absolutePath = path.join(
+    process.cwd(),
+    "public",
+    imageUrl
+  );
+
+  const resolvedPath = path.resolve(
+    absolutePath
+  );
 
   if (
     !resolvedPath.startsWith(
@@ -332,7 +370,7 @@ async function imageToDataUri(
     )
   ) {
     throw new Error(
-      "Invalid image path."
+      "Image path is outside the public directory."
     );
   }
 
@@ -343,18 +381,24 @@ async function imageToDataUri(
 
   const extension =
     path
-      .extname(
-        resolvedPath
-      )
+      .extname(resolvedPath)
       .toLowerCase();
 
-  const mimeType =
+  let mimeType =
+    "image/png";
+
+  if (
     extension === ".jpg" ||
     extension === ".jpeg"
-      ? "image/jpeg"
-      : extension === ".webp"
-        ? "image/webp"
-        : "image/png";
+  ) {
+    mimeType = "image/jpeg";
+  }
+
+  if (
+    extension === ".webp"
+  ) {
+    mimeType = "image/webp";
+  }
 
   return `data:${mimeType};base64,${imageBuffer.toString(
     "base64"
@@ -362,22 +406,31 @@ async function imageToDataUri(
 }
 
 async function startVideoGeneration({
+  apiKey,
   image,
   prompt,
   duration,
+  resolution,
+  aspectRatio,
+  generateAudio,
 }: {
+  apiKey: string;
   image: string;
   prompt: string;
   duration: number;
+  resolution: Resolution;
+  aspectRatio: AspectRatio;
+  generateAudio: boolean;
 }) {
   const response =
     await fetch(
-      "https://api.x.ai/v1/videos/generations",
+      XAI_VIDEO_ENDPOINT,
       {
         method: "POST",
 
         headers: {
-          Authorization: `Bearer ${XAI_API_KEY}`,
+          Authorization:
+            `Bearer ${apiKey}`,
           "Content-Type":
             "application/json",
         },
@@ -395,10 +448,12 @@ async function startVideoGeneration({
           duration,
 
           aspect_ratio:
-            "9:16",
+            aspectRatio,
 
-          resolution:
-            "720p",
+          resolution,
+
+          generate_audio:
+            generateAudio,
         }),
       }
     );
@@ -424,6 +479,7 @@ async function startVideoGeneration({
 }
 
 async function pollVideo(
+  apiKey: string,
   requestId: string
 ) {
   const startedAt =
@@ -446,7 +502,8 @@ async function pollVideo(
           method: "GET",
 
           headers: {
-            Authorization: `Bearer ${XAI_API_KEY}`,
+            Authorization:
+              `Bearer ${apiKey}`,
           },
 
           cache: "no-store",
@@ -469,7 +526,7 @@ async function pollVideo(
     ) {
       if (!data.video?.url) {
         throw new Error(
-          "xAI marked the video complete but returned no video URL."
+          "xAI completed the video but returned no video URL."
         );
       }
 
@@ -561,7 +618,10 @@ export async function POST(
   request: Request
 ) {
   try {
-    if (!XAI_API_KEY) {
+    const apiKey =
+      process.env.XAI_API_KEY;
+
+    if (!apiKey) {
       return NextResponse.json(
         {
           error:
@@ -617,6 +677,24 @@ export async function POST(
         ? body.shot
         : "Full body";
 
+    const resolution =
+      VALID_RESOLUTIONS.includes(
+        body?.resolution
+      )
+        ? body.resolution
+        : DEFAULT_RESOLUTION;
+
+    const aspectRatio =
+      VALID_ASPECT_RATIOS.includes(
+        body?.aspect_ratio
+      )
+        ? body.aspect_ratio
+        : DEFAULT_ASPECT_RATIO;
+
+    const generateAudio =
+      body?.generate_audio ===
+      true;
+
     if (!image) {
       return NextResponse.json(
         {
@@ -663,28 +741,6 @@ export async function POST(
       );
     }
 
-    console.log(
-      "================================="
-    );
-
-    console.log(
-      "APARNA REEL GENERATION"
-    );
-
-    console.log(
-      "================================="
-    );
-
-    console.log({
-      image,
-      reelStyle,
-      thirstLevel,
-      duration,
-      location,
-      mood,
-      shot,
-    });
-
     const imageDataUri =
       await imageToDataUri(
         image
@@ -700,15 +756,42 @@ export async function POST(
       });
 
     console.log(
-      "Starting xAI video generation..."
+      "================================="
+    );
+
+    console.log(
+      "APARNA VIDEO GENERATION"
+    );
+
+    console.log({
+      model:
+        XAI_VIDEO_MODEL,
+      image,
+      reelStyle,
+      thirstLevel,
+      duration,
+      resolution,
+      aspectRatio,
+      generateAudio,
+      location,
+      mood,
+      shot,
+    });
+
+    console.log(
+      "================================="
     );
 
     const requestId =
       await startVideoGeneration({
+        apiKey,
         image:
           imageDataUri,
         prompt,
         duration,
+        resolution,
+        aspectRatio,
+        generateAudio,
       });
 
     console.log(
@@ -718,12 +801,9 @@ export async function POST(
 
     const result =
       await pollVideo(
+        apiKey,
         requestId
       );
-
-    console.log(
-      "xAI video generated."
-    );
 
     const videoUrl =
       await saveVideo(
@@ -736,9 +816,14 @@ export async function POST(
     );
 
     return NextResponse.json({
-      status: "generated",
+      status:
+        "generated",
 
-      video: videoUrl,
+      model:
+        XAI_VIDEO_MODEL,
+
+      video:
+        videoUrl,
 
       request_id:
         requestId,
@@ -753,10 +838,12 @@ export async function POST(
         duration,
 
         aspect_ratio:
-          "9:16",
+          aspectRatio,
 
-        resolution:
-          "720p",
+        resolution,
+
+        generate_audio:
+          generateAudio,
 
         location,
 
@@ -767,17 +854,8 @@ export async function POST(
     });
   } catch (error) {
     console.error(
-      "================================="
-    );
-
-    console.error(
-      "APARNA REEL GENERATION ERROR"
-    );
-
-    console.error(error);
-
-    console.error(
-      "================================="
+      "APARNA VIDEO GENERATION ERROR",
+      error
     );
 
     return NextResponse.json(
@@ -785,7 +863,7 @@ export async function POST(
         error:
           error instanceof Error
             ? error.message
-            : "Reel generation failed.",
+            : "Video generation failed.",
       },
       {
         status: 500,
