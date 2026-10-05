@@ -16,12 +16,41 @@ const SESSION_ID =
   process.env.OPENCLAW_SESSION_ID ||
   "aparna-image-generation";
 
+const VALID_CONTENT_TYPES = [
+  "photo",
+  "reel_cover",
+  "reel_frame",
+];
+
+const VALID_REEL_STYLES = [
+  "indian_glam_thirst_trap",
+  "mirror_glam",
+  "saree_glam",
+  "bodycon_glam",
+  "night_out_glam",
+  "resort_glam",
+];
+
+function normalizeThirstLevel(value: unknown) {
+  if (value === undefined || value === null || value === "") {
+    return 4;
+  }
+
+  const number = Number(value);
+
+  if (
+    !Number.isInteger(number) ||
+    number < 1 ||
+    number > 5
+  ) {
+    return null;
+  }
+
+  return number;
+}
+
 export async function POST(request: Request) {
   try {
-    // ============================================================
-    // 1. READ UI PARAMETERS
-    // ============================================================
-
     const body = await request.json();
 
     const {
@@ -32,6 +61,27 @@ export async function POST(request: Request) {
       shot,
     } = body;
 
+    const contentType =
+      typeof body.content_type === "string" &&
+      VALID_CONTENT_TYPES.includes(
+        body.content_type
+      )
+        ? body.content_type
+        : "photo";
+
+    const reelStyle =
+      typeof body.reel_style === "string" &&
+      VALID_REEL_STYLES.includes(
+        body.reel_style
+      )
+        ? body.reel_style
+        : "indian_glam_thirst_trap";
+
+    const thirstLevel =
+      normalizeThirstLevel(
+        body.thirst_level
+      );
+
     if (
       !time ||
       !mood ||
@@ -41,15 +91,32 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         {
-          error: "Missing generation parameters",
+          error:
+            "Missing generation parameters",
         },
         { status: 400 }
       );
     }
 
-    console.log("=================================");
-    console.log("APARNA IMAGE GENERATION");
-    console.log("=================================");
+    if (thirstLevel === null) {
+      return NextResponse.json(
+        {
+          error:
+            "thirst_level must be an integer from 1 to 5",
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log(
+      "================================="
+    );
+    console.log(
+      "APARNA IMAGE GENERATION"
+    );
+    console.log(
+      "================================="
+    );
 
     console.log({
       time,
@@ -57,11 +124,14 @@ export async function POST(request: Request) {
       outfit_id,
       location,
       shot,
+      contentType,
+      reelStyle,
+      thirstLevel,
     });
 
-    // ============================================================
-    // 2. PROMPT OPENCLAW
-    // ============================================================
+    const isReel =
+      contentType === "reel_cover" ||
+      contentType === "reel_frame";
 
     const prompt = `
 You are Aparna's image-generation controller.
@@ -69,7 +139,9 @@ You are Aparna's image-generation controller.
 Your task is to generate ONE highly photorealistic Instagram-ready
 photograph of Aparna.
 
+============================================================
 USER SELECTED PARAMETERS
+============================================================
 
 TIME:
 ${time}
@@ -86,6 +158,98 @@ ${location}
 CAMERA / SHOT:
 ${shot}
 
+CONTENT TYPE:
+${contentType}
+
+REEL STYLE:
+${reelStyle}
+
+THIRST LEVEL:
+${thirstLevel}/5
+
+============================================================
+REEL CONTENT MODE
+============================================================
+
+${
+  isReel
+    ? `
+This image is a frame/cover for a short-form Instagram Reel.
+
+The Reel direction is:
+
+INDIAN GLAM THIRST-TRAP FASHION
+
+The content should be:
+
+- glamorous
+- confident
+- revealing fashion
+- flirtatious
+- visually attention-grabbing
+- fashion-forward
+- social-media-native
+- realistic
+
+Aparna can deliberately pose for the camera.
+
+She can have strong eye contact.
+
+She can use confident body language.
+
+She can wear revealing fashion when that is what the canonical
+wardrobe item contains.
+
+The composition may emphasize:
+
+- outfit silhouette
+- saree drape
+- blouse design
+- waistline
+- back detail
+- neckline
+- fabric movement
+- jewellery
+- confident posture
+
+The content must remain non-explicit fashion/lifestyle content.
+
+Do NOT depict explicit sexual activity.
+
+Do NOT create pornography.
+
+Do NOT invent a different garment simply to make the image more
+provocative.
+
+The selected wardrobe item remains authoritative.
+
+The image should feel like a real Instagram Reel frame captured
+with a modern smartphone.
+
+Read:
+
+skills/reel-engine/SKILL.md
+
+Follow its rules for:
+
+- thirst level
+- Indian glamour
+- camera
+- posing
+- expression
+- Reel composition
+- variation
+- realism
+- originality
+`
+    : `
+This is a normal Instagram photograph.
+
+Do not force a Reel aesthetic.
+
+Use the selected mood and scene naturally.
+`
+}
 
 ============================================================
 APARNA IDENTITY
@@ -95,8 +259,7 @@ Aparna is a fictional adult Indian woman.
 
 She has an established visual identity.
 
-Before generating the image, inspect the available Aparna workspace
-and visual references.
+Before generating:
 
 Read/use:
 
@@ -114,7 +277,6 @@ references/hair/
 Location references:
 
 locations/
-
 
 ============================================================
 IDENTITY CONSISTENCY
@@ -139,7 +301,7 @@ Preserve:
 - height impression
 - hair length
 - hair texture
-- hair color
+- hair colour
 - overall age appearance
 
 Do not randomly redesign her face.
@@ -153,14 +315,11 @@ Do not beautify her into a generic commercial model.
 The image should feel like another photograph of the SAME PERSON
 taken on another day.
 
-
 ============================================================
-HUMAN PHOTOGRAPHY REQUIREMENT
+HUMAN PHOTOGRAPHY
 ============================================================
 
-This is extremely important:
-
-The final image MUST look like a photograph of a REAL HUMAN BEING.
+The final image MUST look like a photograph of a real human being.
 
 It must NOT look AI-generated.
 
@@ -171,9 +330,7 @@ Use:
 - natural facial asymmetry
 - realistic skin texture
 - subtle pores
-- subtle fine lines
 - natural under-eye texture
-- realistic lips
 - natural skin variation
 - tiny imperfections
 - realistic hair strands
@@ -184,7 +341,6 @@ Use:
 - realistic fingers
 - realistic joints
 - physically believable anatomy
-
 
 ============================================================
 SKIN
@@ -197,7 +353,7 @@ Avoid:
 - porcelain skin
 - excessive smoothing
 - airbrushed skin
-- unrealistic skin glow
+- unrealistic glow
 - excessive beauty retouching
 - perfectly uniform skin
 
@@ -205,11 +361,10 @@ Skin should have:
 
 - subtle texture
 - realistic pores
-- natural tonal variation
+- tonal variation
 - believable highlights
 - believable shadows
 - small natural imperfections
-
 
 ============================================================
 FACE
@@ -217,20 +372,18 @@ FACE
 
 Avoid the typical AI-generated face.
 
-Do NOT make:
+Do NOT create:
 
 - perfectly symmetrical eyes
-- overly sharp jawline
-- unnaturally perfect skin
 - oversized eyes
 - exaggerated lips
 - artificial beauty-filter appearance
 - doll-like appearance
+- unnaturally sharp jawline
 
 Maintain subtle natural asymmetry.
 
 The face should look like it was captured by a real camera.
-
 
 ============================================================
 HAIR
@@ -244,16 +397,15 @@ Include:
 - realistic density
 - natural flyaways
 - slightly imperfect styling
-- believable shadows between hair strands
+- believable shadows
 - realistic interaction with light
 
 Avoid:
 
 - solid plastic hair
-- painted-looking hair
-- perfectly separated curls
+- painted hair
 - CGI hair
-
+- perfectly separated curls
 
 ============================================================
 BODY AND ANATOMY
@@ -267,29 +419,31 @@ Make sure:
 
 - fingers have correct anatomy
 - hands have natural positioning
-- arms connect naturally to shoulders
+- arms connect naturally
 - legs have realistic proportions
 - feet look natural
 - joints bend naturally
 - posture is physically plausible
 
-Avoid exaggerated body proportions unless they are explicitly defined
-by Aparna's established reference.
-
 Do not create a mannequin-like body.
 
+Do not randomly change Aparna's established body identity.
 
 ============================================================
 CLOTHING
 ============================================================
 
-The selected outfit must come from the canonical wardrobe.
+The selected outfit MUST come from the canonical wardrobe.
+
+OUTFIT ID:
+
+${outfit_id}
 
 Do NOT invent a completely different outfit.
 
-Preserve the garment's:
+Preserve:
 
-- color
+- colour
 - shape
 - silhouette
 - material
@@ -301,6 +455,8 @@ Preserve the garment's:
 - construction
 - pattern
 - texture
+- embellishments
+- drape
 
 Fabric must behave realistically.
 
@@ -312,10 +468,13 @@ Include:
 - realistic seams
 - natural compression
 - realistic shadows
-- physically believable contact between clothing and body
+- physical contact between garment and body
 
 Avoid clothing that looks painted onto the body.
 
+If the canonical garment is revealing, preserve its actual design.
+
+Do not arbitrarily increase exposure.
 
 ============================================================
 TIME
@@ -324,15 +483,11 @@ TIME
 Use the selected time to determine:
 
 - lighting
-- color temperature
+- colour temperature
 - environment
 - shadows
 - atmosphere
 - activity
-
-Do not simply place text describing the time.
-
-For example:
 
 Morning:
 soft daylight and natural indoor activity.
@@ -348,7 +503,6 @@ appropriate indoor/night lighting.
 
 The lighting must physically match the selected time.
 
-
 ============================================================
 MOOD
 ============================================================
@@ -362,38 +516,31 @@ Use the selected mood to influence:
 - pose
 - energy
 
-The expression should remain subtle and believable.
+The expression should remain believable.
+
+For high thirst levels, confidence and camera awareness can increase.
 
 Do not create exaggerated influencer expressions.
-
-Avoid:
-
-- forced smiling
-- exaggerated posing
-- unnatural seduction
-- mannequin poses
-
 
 ============================================================
 LOCATION
 ============================================================
 
-Use the selected location:
+Use:
 
 ${location}
 
 The environment should look physically believable.
 
-Respect the established Aparna environment from:
+Respect established Aparna environments from:
 
 locations/
 
-If the location is her Mumbai apartment, maintain continuity
-with her established apartment style.
+If this is her Mumbai apartment, maintain continuity with the
+established apartment.
 
-Do not create a luxury hotel, palace or unrealistic penthouse
-unless explicitly specified.
-
+Do not create a luxury hotel, palace or unrealistic penthouse unless
+explicitly specified.
 
 ============================================================
 CAMERA
@@ -403,8 +550,8 @@ Selected shot:
 
 ${shot}
 
-Make the image look like it was captured using a real camera
-or modern smartphone.
+Make the image look like it was captured using a real camera or
+modern smartphone.
 
 Use realistic:
 
@@ -418,10 +565,37 @@ Use realistic:
 - reflections
 - motion characteristics
 
-The photograph can contain tiny imperfections.
+The image may contain tiny photographic imperfections.
 
 It should NOT look perfectly rendered.
 
+============================================================
+SOCIAL MEDIA COMPOSITION
+============================================================
+
+For Reel content:
+
+- prioritize vertical 9:16 composition
+- keep Aparna clearly visible
+- make the first visual moment strong
+- avoid unnecessary empty space
+- keep important facial/outfit details inside the safe central area
+- make the composition readable on a phone
+- make the frame visually compelling without text
+
+For a thirst level of ${thirstLevel}/5:
+
+${
+  thirstLevel === 1
+    ? "Use attractive but mostly lifestyle-oriented fashion."
+    : thirstLevel === 2
+      ? "Use polished glamorous fashion with moderate camera awareness."
+      : thirstLevel === 3
+        ? "Use clearly flirtatious fashion, confident posing and eye contact."
+        : thirstLevel === 4
+          ? "Use a strong thirst-trap fashion composition with revealing styling, confident silhouette and deliberate camera attention."
+          : "Use very provocative fashion styling, strong silhouette and intimate camera awareness while remaining non-explicit."
+}
 
 ============================================================
 PHOTOGRAPHIC REALISM
@@ -453,18 +627,9 @@ NOT:
 
 NOT:
 
-"beauty advertisement"
-
-NOT:
-
 "perfect stock photograph"
 
-NOT:
-
-"uncanny AI portrait"
-
-
-Use realistic photographic characteristics:
+Use:
 
 - natural exposure
 - subtle lens softness
@@ -475,7 +640,6 @@ Use realistic photographic characteristics:
 - slight optical imperfections
 - realistic skin response to light
 - physically plausible shadows
-
 
 ============================================================
 COMPOSITION
@@ -497,20 +661,24 @@ Follow the requested shot:
 
 ${shot}
 
-
 ============================================================
 INSTAGRAM STYLE
 ============================================================
 
-The photograph should be suitable for Instagram.
-
-It should feel like something Aparna genuinely photographed
+The image should feel like something Aparna genuinely photographed
 or had a friend photograph.
 
 Avoid overly commercial fashion-campaign aesthetics.
 
-A casual, authentic photograph is preferred over perfection.
+Prefer:
 
+- authentic
+- intimate
+- phone-camera feeling
+- believable
+- visually attractive
+- confident
+- modern Indian fashion
 
 ============================================================
 FINAL QUALITY TEST
@@ -523,16 +691,21 @@ Check:
 1. Does she look like a real human?
 2. Does she look like Aparna?
 3. Does the face remain consistent?
-4. Does the anatomy look natural?
-5. Do the hands and fingers look correct?
-6. Does the clothing look physically real?
-7. Does the lighting match the selected time?
-8. Does the environment match the location?
-9. Does the expression match the mood?
-10. Does the image look like a genuine photograph?
+4. Does the body identity remain consistent?
+5. Does the anatomy look natural?
+6. Do the hands and fingers look correct?
+7. Does the clothing look physically real?
+8. Does the garment match the wardrobe?
+9. Does the lighting match the selected time?
+10. Does the environment match the location?
+11. Does the expression match the mood?
+12. Does the image work for Instagram?
+13. If Reel content, does it look visually compelling in 9:16?
+14. Is the content revealing but non-explicit?
+15. Does it look like a genuine photograph?
 
-If something looks obviously artificial, regenerate or correct it
-before returning the final image.
+If something looks obviously artificial, correct or regenerate it before
+returning the final image.
 
 Generate ONE final image.
 
@@ -548,10 +721,6 @@ After generation, return:
     console.log(
       "Calling OpenClaw image generation..."
     );
-
-    // ============================================================
-    // 3. CALL OPENCLAW
-    // ============================================================
 
     const {
       stdout,
@@ -581,10 +750,6 @@ After generation, return:
       );
     }
 
-    // ============================================================
-    // 4. PARSE OPENCLAW RESPONSE
-    // ============================================================
-
     let openclawResponse: any;
 
     try {
@@ -606,16 +771,6 @@ After generation, return:
       );
     }
 
-    // ============================================================
-    // 5. EXTRACT MEDIA
-    //
-    // Actual OpenClaw structure:
-    //
-    // result
-    //   └── payloads
-    //       └── mediaUrl
-    // ============================================================
-
     const payload =
       openclawResponse
         ?.result
@@ -630,11 +785,6 @@ After generation, return:
     const imagePath =
       payload?.mediaUrl ||
       payload?.mediaUrls?.[0];
-
-    console.log(
-      "Generated image path:",
-      imagePath
-    );
 
     if (!imagePath) {
       console.error(
@@ -658,16 +808,9 @@ After generation, return:
       );
     }
 
-    // ============================================================
-    // 6. VERIFY IMAGE
-    // ============================================================
-
     if (!fs.existsSync(imagePath)) {
       console.error(
-        "Generated image does not exist:"
-      );
-
-      console.error(
+        "Generated image does not exist:",
         imagePath
       );
 
@@ -680,14 +823,6 @@ After generation, return:
         { status: 500 }
       );
     }
-
-    console.log(
-      "Generated image verified."
-    );
-
-    // ============================================================
-    // 7. COPY TO NEXT.JS PUBLIC DIRECTORY
-    // ============================================================
 
     const generatedDirectory =
       path.join(
@@ -703,10 +838,6 @@ After generation, return:
       }
     );
 
-    // ============================================================
-    // 8. CREATE UNIQUE FILE NAME
-    // ============================================================
-
     const extension =
       path.extname(imagePath) ||
       ".png";
@@ -720,23 +851,10 @@ After generation, return:
         filename
       );
 
-    // ============================================================
-    // 9. COPY IMAGE
-    // ============================================================
-
     fs.copyFileSync(
       imagePath,
       destination
     );
-
-    console.log(
-      "Image copied to:",
-      destination
-    );
-
-    // ============================================================
-    // 10. VERIFY COPY
-    // ============================================================
 
     if (!fs.existsSync(destination)) {
       return NextResponse.json(
@@ -748,25 +866,8 @@ After generation, return:
       );
     }
 
-    // ============================================================
-    // 11. RETURN BROWSER URL
-    // ============================================================
-
     const browserImageUrl =
       `/generated/${filename}`;
-
-    console.log(
-      "Browser image URL:",
-      browserImageUrl
-    );
-
-    console.log(
-      "================================="
-    );
-
-    // ============================================================
-    // 12. SEND IMAGE TO UI
-    // ============================================================
 
     return NextResponse.json({
       status: "generated",
@@ -783,9 +884,11 @@ After generation, return:
         outfit_id,
         location,
         shot,
+        content_type: contentType,
+        reel_style: reelStyle,
+        thirst_level: thirstLevel,
       },
     });
-
   } catch (error) {
     console.error(
       "================================="

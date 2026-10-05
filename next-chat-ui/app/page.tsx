@@ -44,6 +44,15 @@ const shots = [
   "Fashion portrait",
 ];
 
+const reelStyles = [
+  "indian_glam_thirst_trap",
+  "mirror_glam",
+  "saree_glam",
+  "bodycon_glam",
+  "night_out_glam",
+  "resort_glam",
+];
+
 type WardrobeItem = {
   id: string;
   name: string;
@@ -74,17 +83,36 @@ export default function Home() {
   const [shot, setShot] =
     useState("Full body");
 
+  const [reelStyle, setReelStyle] =
+    useState(
+      "indian_glam_thirst_trap"
+    );
+
+  const [thirstLevel, setThirstLevel] =
+    useState(4);
+
+  const [reelDuration, setReelDuration] =
+    useState(8);
+
   const [wardrobe, setWardrobe] =
     useState<WardrobeItem[]>([]);
 
   const [image, setImage] =
     useState<string | null>(null);
 
-  const [loading, setLoading] =
+  const [video, setVideo] =
+    useState<string | null>(null);
+
+  const [loadingImage, setLoadingImage] =
     useState(false);
 
-  const [loadingWardrobe, setLoadingWardrobe] =
-    useState(true);
+  const [loadingVideo, setLoadingVideo] =
+    useState(false);
+
+  const [
+    loadingWardrobe,
+    setLoadingWardrobe,
+  ] = useState(true);
 
   const [error, setError] =
     useState("");
@@ -145,12 +173,14 @@ export default function Home() {
       setError(
         "Add at least one garment to the wardrobe first."
       );
+
       return;
     }
 
-    setLoading(true);
+    setLoadingImage(true);
     setError("");
     setImage(null);
+    setVideo(null);
 
     try {
       const response =
@@ -158,10 +188,12 @@ export default function Home() {
           "/api/aparna/generate",
           {
             method: "POST",
+
             headers: {
               "Content-Type":
                 "application/json",
             },
+
             body: JSON.stringify({
               time,
               mood,
@@ -169,6 +201,12 @@ export default function Home() {
                 outfit,
               location,
               shot,
+              content_type:
+                "reel_cover",
+              reel_style:
+                reelStyle,
+              thirst_level:
+                thirstLevel,
             }),
           }
         );
@@ -191,9 +229,75 @@ export default function Home() {
           : "Something went wrong"
       );
     } finally {
-      setLoading(false);
+      setLoadingImage(false);
     }
   }
+
+  async function generateReel() {
+    if (!image) {
+      setError(
+        "Generate the Aparna frame first."
+      );
+
+      return;
+    }
+
+    setLoadingVideo(true);
+    setError("");
+    setVideo(null);
+
+    try {
+      const response =
+        await fetch(
+          "/api/aparna/reel",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              image,
+              reel_style:
+                reelStyle,
+              thirst_level:
+                thirstLevel,
+              duration:
+                reelDuration,
+              location,
+              mood,
+              shot,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Reel generation failed"
+        );
+      }
+
+      setVideo(data.video);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Reel generation failed."
+      );
+    } finally {
+      setLoadingVideo(false);
+    }
+  }
+
+  const busy =
+    loadingImage ||
+    loadingVideo;
 
   return (
     <main className="app">
@@ -210,12 +314,114 @@ export default function Home() {
 
         <div className="status">
           <span className="status-dot" />
-          OPENCLAW CONNECTED
+          OPENCLAW + GROK VIDEO
         </div>
       </header>
 
       <div className="layout">
         <section className="controls">
+          <div className="control">
+            <label>
+              CONTENT
+            </label>
+
+            <select
+              value="reel"
+              disabled
+            >
+              <option value="reel">
+                INSTAGRAM REEL
+              </option>
+            </select>
+          </div>
+
+          <div className="control">
+            <label>
+              REEL STYLE
+            </label>
+
+            <select
+              value={reelStyle}
+              onChange={(event) =>
+                setReelStyle(
+                  event.target.value
+                )
+              }
+            >
+              {reelStyles.map(
+                (item) => (
+                  <option
+                    key={item}
+                    value={item}
+                  >
+                    {item
+                      .replaceAll(
+                        "_",
+                        " "
+                      )
+                      .toUpperCase()}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
+
+          <div className="control">
+            <label>
+              THIRST LEVEL —{" "}
+              {thirstLevel}/5
+            </label>
+
+            <input
+              type="range"
+              min="1"
+              max="5"
+              step="1"
+              value={thirstLevel}
+              onChange={(event) =>
+                setThirstLevel(
+                  Number(
+                    event.target.value
+                  )
+                )
+              }
+            />
+
+            <small>
+              1 lifestyle · 3 flirty ·
+              4 thirst trap · 5 very
+              provocative
+            </small>
+          </div>
+
+          <div className="control">
+            <label>
+              REEL LENGTH
+            </label>
+
+            <select
+              value={reelDuration}
+              onChange={(event) =>
+                setReelDuration(
+                  Number(
+                    event.target.value
+                  )
+                )
+              }
+            >
+              {[5, 6, 7, 8, 9, 10, 12, 15].map(
+                (seconds) => (
+                  <option
+                    key={seconds}
+                    value={seconds}
+                  >
+                    {seconds} SECONDS
+                  </option>
+                )
+              )}
+            </select>
+          </div>
+
           <div className="control">
             <label>
               TIME
@@ -374,19 +580,37 @@ export default function Home() {
               generateImage
             }
             disabled={
-              loading ||
+              busy ||
               !outfit
             }
           >
-            {loading
-              ? "GENERATING..."
-              : "✦ GENERATE IMAGE"}
+            {loadingImage
+              ? "CREATING FRAME..."
+              : "✦ GENERATE REEL FRAME"}
           </button>
+
+          {image && (
+            <button
+              className="generate-button"
+              onClick={
+                generateReel
+              }
+              disabled={
+                busy
+              }
+            >
+              {loadingVideo
+                ? "GENERATING VIDEO..."
+                : "▶ GENERATE REEL"}
+            </button>
+          )}
         </section>
 
         <section className="preview">
           {!image &&
-            !loading && (
+            !video &&
+            !loadingImage &&
+            !loadingVideo && (
               <div className="empty">
                 <div className="empty-icon">
                   ✦
@@ -398,16 +622,21 @@ export default function Home() {
                 </h2>
 
                 <p>
-                  Add a real garment
-                  from a supported
-                  retailer, choose the
-                  scene, then generate
-                  Aparna.
+                  Generate a strong
+                  vertical fashion frame,
+                  then animate it into
+                  an Instagram Reel.
+                </p>
+
+                <p>
+                  The generated frame
+                  becomes the exact first
+                  frame of the video.
                 </p>
               </div>
             )}
 
-          {loading && (
+          {loadingImage && (
             <div className="loading">
               <div className="loader" />
 
@@ -416,42 +645,94 @@ export default function Home() {
               </h2>
 
               <p>
-                OpenClaw is preparing
-                the scene and image.
+                Building the Reel's
+                first frame.
               </p>
             </div>
           )}
 
-          {image && (
+          {loadingVideo && (
+            <div className="loading">
+              <div className="loader" />
+
+              <h2>
+                Animating Aparna...
+              </h2>
+
+              <p>
+                Grok is turning the
+                still frame into a
+                {reelDuration}-second
+                vertical Reel.
+              </p>
+
+              <p>
+                This can take a little
+                longer than image
+                generation.
+              </p>
+            </div>
+          )}
+
+          {video && (
             <div className="result">
-              <img
-                src={image}
-                alt="Generated Aparna"
+              <video
+                src={video}
+                controls
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{
+                  width: "100%",
+                  maxHeight:
+                    "760px",
+                  objectFit:
+                    "contain",
+                  background:
+                    "#050505",
+                }}
               />
 
               <div className="result-info">
                 <div>
                   <span>
-                    {time}
+                    REEL
                   </span>
 
                   <span>
-                    {mood}
+                    {reelDuration}s
                   </span>
 
                   <span>
-                    {location}
+                    9:16
                   </span>
 
                   <span>
-                    {shot}
+                    720p
+                  </span>
+
+                  <span>
+                    Thirst{" "}
+                    {thirstLevel}/5
+                  </span>
+
+                  <span>
+                    {reelStyle
+                      .replaceAll(
+                        "_",
+                        " "
+                      )}
                   </span>
                 </div>
 
                 <div className="result-actions">
                   <button
                     onClick={
-                      generateImage
+                      generateReel
+                    }
+                    disabled={
+                      loadingVideo
                     }
                   >
                     ↻ REGENERATE
@@ -465,13 +746,63 @@ export default function Home() {
             </div>
           )}
 
-          {error && (
-            <div className="error">
-              {error}
-            </div>
-          )}
+          {!video &&
+            image &&
+            !loadingVideo && (
+              <div className="result">
+                <img
+                  src={image}
+                  alt="Aparna Reel first frame"
+                />
+
+                <div className="result-info">
+                  <div>
+                    <span>
+                      REEL FRAME
+                    </span>
+
+                    <span>
+                      Thirst{" "}
+                      {thirstLevel}/5
+                    </span>
+
+                    <span>
+                      9:16
+                    </span>
+                  </div>
+
+                  <div className="result-actions">
+                    <button
+                      onClick={
+                        generateImage
+                      }
+                      disabled={
+                        loadingImage
+                      }
+                    >
+                      ↻ REGENERATE FRAME
+                    </button>
+
+                    <button
+                      className="approve"
+                      onClick={
+                        generateReel
+                      }
+                    >
+                      ▶ GENERATE VIDEO
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
         </section>
       </div>
+
+      {error && (
+        <div className="error">
+          {error}
+        </div>
+      )}
     </main>
   );
 }

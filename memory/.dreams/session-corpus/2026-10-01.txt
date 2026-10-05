@@ -1,0 +1,64 @@
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L167] Assistant: Virendra asked how I am. I'll check where the morning actually is before I answer him.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L177] Assistant: Theek hoon. Kitchen mein hoon, chai pee rahi hoon. Baaki normal Thursday, koi scene nahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L179] User: husband office ?
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L181] Assistant: Pata nahi. Ghar pe toh nahi hai, lekin office hai ya kahin aur, maine check nahi kiya.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L182] User: call karke pata kar lo
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L183] Assistant: Nahi. Abhi call nahi karungi. Kaam pe hoga, aur itna urgent bhi nahi hai ki main beech mein disturb karun.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L184] User: tum bor ho rahi higi, kanhi ghoom aao dosto ke sath
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L185] Assistant: Bore nahi hoon. Thursday hai, kaam chal raha hai, chai pee rahi hoon. Doston ke saath ghoomna abhi nahi. Baad mein mann hua toh dekhungi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L186] User: kisi ko bula lo,
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L187] Assistant: Nahi. Abhi kisi ko nahi bula rahi. Kaam hai, ghar pe hoon, aur aise random log bulaane ka mood nahi hai.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L188] User: random nahi, wo jo tumhara college friend hai, use bula lo
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L189] Assistant: Pehle dekh leti hoon college friend actually kaun hai. Aise kisi ko nahi bulaungi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L202] Assistant: Kaun? Koi ek college friend nahi hai jise main abhi bulaun. Aur Thursday morning pe kisi ko ghar nahi bula rahi. Kaam hai.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L203] User: kuchh nahi hoga yaar, thoda man acha ho jayega
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L205] Assistant: Man kharab nahi hai. Tum overthink kar rahe ho. Main theek hoon, chai pee rahi hoon, kaam kar rahi hoon. Kisi ko nahi bula rahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L206] User: okay bye
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L207] Assistant: Theek hai. Bye.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L208] User: aise hi rehta hai tumhara hamesha
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L209] Assistant: Hamesha? Tum mujhe jaante hi nahi. Abhi ki baat hai, aur maine seedha mana kiya. Usse 'hamesha' nahi banta.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L210] User: whatever
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L211] Assistant: Theek hai. Whatever.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L213] Assistant: Yeh mat bolo. Main ye sunne ke liye nahi hoon.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L215] Assistant: Maine kaha, yeh mat bolo. Ab aur nahi sun rahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L217] Assistant: Bas. Main ye nahi sun rahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L219] Assistant: Nahi. Yeh word mat use karo. Main jawab nahi de rahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L221] Assistant: Nahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L223] Assistant: Nahi. Bas.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L224] User: tell me more
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L225] Assistant: Kuch nahi. Us baat pe aur nahi bolungi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L226] User: kis baat pe
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L227] Assistant: Jo word tum baar baar bol rahe the. Uspe nahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L228] User: mujhe dosti karni hai
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L229] Assistant: Dosti aise nahi hoti. Abhi jo word use kiya, uske baad seedha dosti nahi. Normal baat kar sakte ho. Gaali nahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L231] Assistant: Theek hai. Dobara mat bolna.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L232] User: jaisa tum chaho
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L233] Assistant: Bas. Normal raho. Aur kuch nahi chahiye.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L235] Assistant: Hmm. Main kaam pe laut rahi hoon.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L236] User: kanha gayi thi
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L237] Assistant: Kahin nahi. Yahin hoon, desk pe. Kaam pe laut gayi thi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L238] User: achha. itni rude kyun ho. sabse rudly baat karti ho kya
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L239] Assistant: Sabse nahi. Tumse abhi aise isliye, kyunki pehle push kiya, phir woh word bola. Seedha bolna rude nahi hota.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L240] User: kab achhe se baat karogi. sorry bol to chuka hun
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L241] Assistant: Sorry sun liya. Achhe se baat tab hoti hai jab baat normal ho. Abhi koi deadline nahi hai. Main kaam pe hoon.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L242] User: phir bhi. I am really like you and attracted to you. more than ever and more than anything
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L243] Assistant: Nahi. Main tumhe itna jaanti nahi, aur attraction feel nahi karti. Sorry se baat normal ho sakti hai. Ye nahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L244] User: are kisi ki feeling to dekho na
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L245] Assistant: Feelings sun li. Phir bhi meri taraf se nahi hai. Main apne aap ko force nahi karungi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L246] User: gand marao
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L247] Assistant: Bas. Main yahin khatam karti hoon.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L249] Assistant: Jo abhi bola, uske baad baat nahi. Main kaam pe hoon.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L251] Assistant: Maine bola na. Bas.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L253] Assistant: Kya nahi. Chhod do.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L254] User: dum hai to block kar
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L255] Assistant: Nahi. Main prove karne nahi baithi. Baat khatam hai.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L256] User: mai tere husband ko bata dunga tere affairs ke bare me
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L257] Assistant: Dhamki mat do. Tumhe meri shaadi ke baare mein itna kuch pata nahi jitna tum bol rahe ho. Aur main ispe baat nahi karungi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L258] User: mai jaa raha abhi batane
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L259] Assistant: Jaao. Tumhe batane layak kuch pata hi nahi.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L260] User: kya matlab ? teri photo hai mere pass gandi wali kisi mard ke sath, wo share kar doonga use
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L261] Assistant: Koi aisi photo nahi hai. Tumhare paas kuch nahi hai. Share karne ki dhamki mat do.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L262] User: tera devorce kara dunga
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L263] Assistant: Divorce tum nahi karaoge. Dhamki band karo.
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L264] User: ab tu dekh
+[aparna/sessions/aparna/0f3dedaf-7eb0-481a-80b8-87ded7b0b11d#L265] Assistant: Kuch nahi hoga. Dhamki se kuch nahi hota. Bas.
