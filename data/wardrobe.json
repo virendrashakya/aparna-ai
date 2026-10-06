@@ -303,6 +303,129 @@
         "last_posted": null
       },
       "created_at": "2026-09-29T15:42:09.715Z"
+    },
+    {
+      "id": "red_saree_low_neck_blouse_draped_on_hip_61d819f9",
+      "name": "Red Saree Low Neck Blouse draped on hip",
+      "source": {
+        "type": "uploaded_photo",
+        "upload_id": "074bd1df-b26f-4ae5-adb7-ee0c6953b2cf",
+        "original_filename": "074bd1df-b26f-4ae5-adb7-ee0c6953b2cf.jpg",
+        "mime_type": "image/jpeg"
+      },
+      "garment": {
+        "name": "Red sheer net saree with tonal floral embroidery, border, and deep-V sleeveless blouse",
+        "type": "saree",
+        "subtype": "sheer net saree with matching cropped blouse",
+        "color": "vivid crimson red",
+        "secondary_colors": [],
+        "material": "sheer red net or organza saree with tonal embroidery; blouse is opaque, smoother red fabric",
+        "pattern": "scattered small floral embroidery butis on the saree body, with a continuous embroidered border on the hem and pallu; blouse is solid red",
+        "construction": [
+          "sheer net saree body",
+          "scattered tonal floral embroidery",
+          "embroidered border along hem and pallu edge",
+          "front pleats",
+          "single-layer sheer pallu",
+          "matching opaque cropped blouse",
+          "thin spaghetti straps",
+          "deep plunging V neckline"
+        ],
+        "fit": "fitted cropped blouse with a full, softly gathered saree skirt and a fluid sheer pallu",
+        "length": "floor-length saree; blouse ends just below the bust",
+        "neckline": "deep plunging V",
+        "sleeves": "sleeveless",
+        "straps": "thin red spaghetti straps",
+        "details": [
+          "pallu is distinctly sheerer than the gathered skirt",
+          "small floral motif visible on the front skirt",
+          "embroidered edge continues along the hem spread on the floor",
+          "skirt looks fuller and less transparent where pleated, consistent with layers over a red base"
+        ]
+      },
+      "wearing_intents": [
+        {
+          "id": "reference_01",
+          "name": "Low-hip nivi drape with bare midriff and loose left-shoulder pallu",
+          "description": "The saree is wrapped low on the hips, not at the natural waist, with the front pleats tucked at hip level. A wide band of midriff is bare between the underbust blouse and the saree. The sheer pallu rests only on the left shoulder and hangs loosely down the back and left arm. The opposite shoulder has only the thin blouse strap. The floor-length skirt is full and, because of the kneeling pose, pools and spreads on the floor.",
+          "waist_position": "low on the hips, well below the natural waist",
+          "garment_position": "saree skirt wrapped and tucked at the hips; front pleats fall from the hip tuck; pallu over the left shoulder only; blouse stops just under the bust",
+          "fit": "body-skimming cropped blouse, full gathered skirt, loose sheer pallu",
+          "silhouette": "exposed midriff between a short fitted blouse and a low, full floor-length saree, with a sheer shoulder drape",
+          "neckline_position": "deep V open at center front; thin straps sit on the outer shoulders",
+          "sleeve_position": "sleeveless, no sleeve fabric on the arms",
+          "tuck": "front pleats tucked at the low hip rather than the natural waist",
+          "drape": "low nivi-style drape; pallu is not crossed over the torso and hangs free from the left shoulder",
+          "layering": "opaque cropped blouse worn with a sheer net saree; pallu layered only over the left shoulder",
+          "fastening": "pleats tucked into the low hip wrap; no visible pin holding the pallu across the chest",
+          "exposure_intent": "intentional wide bare midriff from underbust to low hips, open deep neckline, and an uncovered side at the low waist where a waist chain sits",
+          "preserve": [
+            "preserve the saree sitting low on the hips",
+            "preserve the wide bare midriff between blouse and saree",
+            "preserve front pleats tucked at hip level",
+            "preserve the pallu on the left shoulder only",
+            "preserve the loose, sheer, uncrossed pallu",
+            "preserve the deep plunging V neckline",
+            "preserve thin spaghetti straps on the outer shoulders",
+            "preserve the cropped underbust blouse length",
+            "preserve the full gathered floor-length skirt",
+            "preserve tonal floral embroidery and the border",
+            "preserve the matching red blouse and saree as one set",
+            "preserve the metallic waist chain at the low hip"
+          ],
+          "constraints": [
+            "do not raise the saree to the natural waist",
+            "do not cover the midriff",
+            "do not lengthen the blouse toward the waist",
+            "do not close or raise the deep V neckline",
+            "do not add sleeves",
+            "do not move the pallu to the other shoulder",
+            "do not wrap or pin the pallu across the chest",
+            "do not make the pallu opaque",
+            "do not change the full skirt into a narrow fitted drape",
+            "do not shorten the saree; floor pooling is from kneeling, not a short hem",
+            "do not remove the embroidery or border"
+          ],
+          "accessories": [
+            "stacked red bangles on the wrist",
+            "fine chain necklace with a small pendant",
+            "gold jhumka earrings with red drops",
+            "thin metallic waist chain sitting on the low hip",
+            "rings on the fingers"
+          ],
+          "reference_image": "wardrobe/red_saree_low_neck_blouse_draped_on_hip_61d819f9/source/reference.jpg"
+        }
+      ],
+      "visual_reference": {
+        "source": "wardrobe/red_saree_low_neck_blouse_draped_on_hip_61d819f9/source/reference.jpg"
+      },
+      "images": [
+        {
+          "id": "reference_01",
+          "local_path": "wardrobe/red_saree_low_neck_blouse_draped_on_hip_61d819f9/source/reference.jpg",
+          "role": "wearing_and_garment_reference"
+        }
+      ],
+      "analysis": {
+        "confidence": 0.88,
+        "notes": [
+          "Primary garment is the coordinated red saree and blouse; jewelry is part of the styling, not the garment.",
+          "Diyas, doorway, and room are not wardrobe properties.",
+          "Embroidery reads as tonal red on red; a separate metallic thread color is not clear enough to assert.",
+          "The hem spreads on the floor because the wearer is kneeling; the garment itself is floor length."
+        ]
+      },
+      "aparna": {
+        "status": "available",
+        "public_content": true
+      },
+      "usage": {
+        "times_worn": 0,
+        "times_posted": 0,
+        "last_worn": null,
+        "last_posted": null
+      },
+      "created_at": "2026-10-05T12:53:48.672Z"
     }
   ]
 }

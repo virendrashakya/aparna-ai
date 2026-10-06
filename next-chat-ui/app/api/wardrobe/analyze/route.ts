@@ -1,27 +1,30 @@
 import { NextResponse } from "next/server";
+import { execFile } from "child_process";
+import { promisify } from "util";
 import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 
+const execFileAsync = promisify(execFile);
+
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 180;
 
 const WORKSPACE =
   process.env.APARNA_WORKSPACE ||
   path.resolve(process.cwd(), "..");
+
+const OPENCLAW_BIN =
+  process.env.OPENCLAW_BIN || "openclaw";
+
+const OPENCLAW_AGENT =
+  process.env.OPENCLAW_AGENT || "aparna";
 
 const UPLOAD_DIRECTORY = path.join(
   WORKSPACE,
   "wardrobe",
   "_uploads"
 );
-
-const XAI_API_URL =
-  "https://api.x.ai/v1/responses";
-
-const XAI_MODEL =
-  process.env.WARDROBE_VISION_MODEL ||
-  "grok-4.7";
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
@@ -30,6 +33,14 @@ const ALLOWED_TYPES = new Set([
   "image/jpg",
   "image/png",
 ]);
+
+function extensionForMimeType(mimeType: string) {
+  if (mimeType === "image/png") {
+    return ".png";
+  }
+
+  return ".jpg";
+}
 
 function extractJson(text: string): unknown {
   const trimmed = text.trim();
@@ -67,23 +78,13 @@ function extractJson(text: string): unknown {
         )
       );
     } catch {
-      // Ignore.
+      // Continue below.
     }
   }
 
   throw new Error(
-    "The vision model returned invalid garment analysis."
+    "OpenClaw returned invalid garment analysis JSON."
   );
-}
-
-function extensionForMimeType(
-  mimeType: string
-) {
-  if (mimeType === "image/png") {
-    return ".png";
-  }
-
-  return ".jpg";
 }
 
 function normalizeAnalysis(value: any) {
@@ -100,7 +101,8 @@ function normalizeAnalysis(value: any) {
       : {};
 
   const stringOrNull = (input: unknown) =>
-    typeof input === "string" && input.trim()
+    typeof input === "string" &&
+    input.trim()
       ? input.trim()
       : null;
 
@@ -262,62 +264,45 @@ function normalizeAnalysis(value: any) {
   };
 }
 
-function extractResponseText(
-  response: any
-): string {
-  if (
-    typeof response?.output_text ===
-    "string"
-  ) {
-    return response.output_text;
+function extractOpenClawText(response: any): string {
+  const payloads =
+    response?.result?.payloads ??
+    response?.result?.result?.payloads ??
+    [];
+
+  if (!Array.isArray(payloads)) {
+    return "";
   }
 
-  const output = Array.isArray(
-    response?.output
-  )
-    ? response.output
-    : [];
-
-  const parts: string[] = [];
-
-  for (const item of output) {
-    if (
-      typeof item?.text === "string"
-    ) {
-      parts.push(item.text);
-    }
-
-    if (Array.isArray(item?.content)) {
-      for (const content of item.content) {
-        if (
-          typeof content?.text === "string"
-        ) {
-          parts.push(content.text);
-        }
-      }
-    }
-  }
-
-  return parts.join("\n").trim();
+  return payloads
+    .map((payload: any) =>
+      typeof payload?.text === "string"
+        ? payload.text
+        : ""
+    )
+    .filter(Boolean)
+    .join("\n")
+    .trim();
 }
 
-export async function POST(
-  request: Request
+function extractErrorText(
+  stdout: string,
+  stderr: string
 ) {
+  const combined =
+    `${stdout}\n${stderr}`.trim();
+
+  if (!combined) {
+    return "OpenClaw wardrobe analysis failed.";
+  }
+
+  return combined.slice(-4000);
+}
+
+export async function POST(request: Request) {
+  let absolutePath = "";
+
   try {
-    const apiKey =
-      process.env.XAI_API_KEY;
-
-    if (!apiKey) {
-      return NextResponse.json(
-        {
-          error:
-            "XAI_API_KEY is not configured.",
-        },
-        { status: 500 }
-      );
-    }
-
     const formData =
       await request.formData();
 
@@ -334,11 +319,10 @@ export async function POST(
       );
     }
 
-    if (
-      !ALLOWED_TYPES.has(
-        file.type.toLowerCase()
-      )
-    ) {
+    const mimeType =
+      file.type.toLowerCase();
+
+    if (!ALLOWED_TYPES.has(mimeType)) {
       return NextResponse.json(
         {
           error:
@@ -368,20 +352,83 @@ export async function POST(
       );
     }
 
+    /*
+     * Save the uploaded image BEFORE invoking OpenClaw.
+     *
+     * OpenClaw can then inspect the real local image through
+     * its workspace/image tools instead of us sending the
+     * image directly to an external API.
+     */
     const buffer = Buffer.from(
       await file.arrayBuffer()
     );
 
-    const mimeType =
-      file.type.toLowerCase();
+    const uploadId =
+      crypto.randomUUID();
 
-    const dataUrl =
-      `data:${mimeType};base64,${buffer.toString(
-        "base64"
-      )}`;
+    await fs.mkdir(
+      UPLOAD_DIRECTORY,
+      {
+        recursive: true,
+      }
+    );
 
+    const extension =
+      extensionForMimeType(
+        mimeType
+      );
+
+    const filename =
+      `${uploadId}${extension}`;
+
+    absolutePath =
+      path.join(
+        UPLOAD_DIRECTORY,
+        filename
+      );
+
+    await fs.writeFile(
+      absolutePath,
+      buffer
+    );
+
+    const relativePath =
+      path
+        .relative(
+          WORKSPACE,
+          absolutePath
+        )
+        .split(path.sep)
+        .join("/");
+
+    /*
+     * IMPORTANT:
+     *
+     * We deliberately do NOT call xAI directly here.
+     *
+     * OpenClaw already has Aparna's configured model,
+     * credentials and image tools.
+     *
+     * The uploaded image lives inside the Aparna workspace,
+     * so the agent can inspect it with its available image/file
+     * tools.
+     */
     const prompt = `
 You are Aparna's wardrobe vision analyzer.
+
+This is a wardrobe ingestion task.
+
+You must inspect the uploaded image located at:
+
+${absolutePath}
+
+Use your available workspace/file/image tools to OPEN AND VISUALLY INSPECT this image before answering.
+
+Do NOT guess from the filename.
+
+============================================================
+TASK
+============================================================
 
 Analyze the uploaded fashion/outfit photograph.
 
@@ -391,13 +438,29 @@ Your job is to identify:
 
 1. WHAT GARMENT OR GARMENTS ARE PRESENT.
 2. HOW THE GARMENT IS ACTUALLY BEING WORN.
-3. WHICH PHYSICAL STYLING DETAILS MUST be preserved when another person wears the same garment.
+3. WHICH PHYSICAL STYLING DETAILS MUST BE PRESERVED when another person wears the same garment.
 
-This image is a WARDROBE + WEARING-STYLE REFERENCE.
+This image is a:
+
+WARDROBE + WEARING-STYLE REFERENCE
+
+The most important distinction is:
+
+GARMENT IDENTITY
+versus
+WEARING INTENT.
+
+The wardrobe item describes WHAT the clothing is.
+
+The wearing_intent describes HOW that clothing is positioned and worn in this specific reference.
+
+============================================================
+WEARING INTENT
+============================================================
 
 Be precise about physical relationships.
 
-For example, distinguish between:
+Observe and record things such as:
 
 - high waist
 - natural waist
@@ -405,39 +468,83 @@ For example, distinguish between:
 - sitting on hips
 - tucked
 - untucked
+- partially tucked
 - cropped
 - oversized
 - fitted
 - body-skimming
 - loose
-- draped
 - wrapped
+- draped
 - layered
-- partially tucked
 - neckline position
 - sleeve position
 - strap placement
+- garment length
+- silhouette
+- fastening
+- visible layering
+- relationship between coordinated garments
+
+For Indian clothing also inspect:
+
 - saree pallu position
 - saree pleat arrangement
+- saree waist placement
 - blouse relationship to saree
-- visible layering
-- fastening
-- silhouette
-- garment length
+- dupatta position
+- lehenga waist placement
+- blouse/choli relationship
+- kurta/bottom relationship
 
-Do not invent details that cannot be observed.
+If the reference intentionally shows a particular way of wearing the garment, preserve that information.
+
+For example:
+
+If the skirt is visibly worn below the natural waist and sits on the hips, record:
+
+- waist_position
+- garment_position
+- silhouette
+- preserve rules
+- constraints
+
+Do NOT convert that into a generic "skirt" description.
+
+The wearing intent is specifically what will later control image and video generation.
+
+============================================================
+IMPORTANT RULES
+============================================================
+
+Do not identify the person.
 
 Do not describe the person's identity.
 
 Do not infer body measurements.
 
-Do not preserve the person's face, hair, body, skin, pose or background as wardrobe properties.
+Do not treat the person's face, hair, body, skin tone, pose or background as wardrobe properties.
+
+Do not invent details that cannot be observed.
+
+Do not replace observed styling with a generic/default way of wearing the garment.
 
 The garment itself and the way it is worn are the important information.
 
-If multiple garments are clearly visible, identify the PRIMARY garment as the main garment and mention coordinated garments/accessories in notes.
+If multiple garments are clearly visible:
+
+- identify the PRIMARY garment as the main garment
+- mention coordinated garments/accessories in notes
+
+============================================================
+OUTPUT
+============================================================
 
 Return ONLY valid JSON.
+
+No markdown.
+
+No explanation before or after the JSON.
 
 Use exactly this structure:
 
@@ -480,102 +587,128 @@ Use exactly this structure:
   "notes": []
 }
 
-IMPORTANT:
+============================================================
+QUALITY REQUIREMENT
+============================================================
 
-The wearing_intent must describe HOW THIS GARMENT IS WORN IN THIS IMAGE.
+The wearing_intent must describe:
 
-Do not replace observed styling with a generic/default way of wearing the garment.
+HOW THIS GARMENT IS WORN IN THIS IMAGE.
 
-If the garment is intentionally low-waisted, record that.
+Do not simply repeat the garment description.
 
-If it is tucked in a particular way, record that.
+The wearing intent should contain actionable physical information that another image/video generation system can follow.
 
-If a saree is draped in a particular way, record that.
+Examples of useful preserve rules:
 
-If a blouse or top is visibly positioned relative to another garment, record that relationship.
+- "preserve low waist placement"
+- "preserve garment sitting on hips"
+- "preserve fitted silhouette"
+- "preserve visible relationship between blouse and saree"
+- "preserve pallu over left shoulder"
+- "preserve front tuck"
+- "preserve cropped top length"
+- "preserve sleeve pushed above elbow"
 
-The resulting wearing_intent will later be passed to an image and video generation system.
+Examples of useful constraints:
+
+- "do not raise waist to natural waist"
+- "do not make the garment high-waisted"
+- "do not change the drape"
+- "do not remove visible layering"
+- "do not lengthen the garment"
+- "do not convert fitted styling into loose styling"
+
+Only include such rules when supported by what you actually observe.
+
+Return JSON only.
 `;
 
-    const response =
-      await fetch(
-        XAI_API_URL,
+    const sessionId =
+      `wardrobe-analysis-${uploadId}`;
+
+    console.log(
+      "================================="
+    );
+    console.log(
+      "APARNA WARDROBE ANALYSIS"
+    );
+    console.log(
+      "================================="
+    );
+    console.log({
+      agent: OPENCLAW_AGENT,
+      sessionId,
+      image: absolutePath,
+    });
+
+    const { stdout, stderr } =
+      await execFileAsync(
+        OPENCLAW_BIN,
+        [
+          "agent",
+          "--agent",
+          OPENCLAW_AGENT,
+          "--session-id",
+          sessionId,
+          "--message",
+          prompt,
+          "--json",
+        ],
         {
-          method: "POST",
-          headers: {
-            Authorization:
-              `Bearer ${apiKey}`,
-            "Content-Type":
-              "application/json",
+          cwd: WORKSPACE,
+          timeout: 150000,
+          maxBuffer:
+            10 * 1024 * 1024,
+          env: {
+            ...process.env,
           },
-          body: JSON.stringify({
-            model: XAI_MODEL,
-            store: false,
-            input: [
-              {
-                role: "user",
-                content: [
-                  {
-                    type: "input_image",
-                    image_url:
-                      dataUrl,
-                    detail: "high",
-                  },
-                  {
-                    type: "input_text",
-                    text: prompt,
-                  },
-                ],
-              },
-            ],
-          }),
         }
       );
 
-    const responseText =
-      await response.text();
-
-    let responseJson: any;
-
-    try {
-      responseJson =
-        JSON.parse(responseText);
-    } catch {
-      throw new Error(
-        `xAI returned invalid JSON (${response.status}).`
+    if (stderr?.trim()) {
+      console.log(
+        "OpenClaw stderr:",
+        stderr
       );
     }
 
-    if (!response.ok) {
+    let openClawResponse: any;
+
+    try {
+      openClawResponse =
+        JSON.parse(stdout);
+    } catch {
       console.error(
-        "xAI wardrobe analysis error:",
-        responseJson
+        "OpenClaw returned non-JSON stdout:",
+        stdout
       );
 
-      return NextResponse.json(
-        {
-          error:
-            responseJson?.error?.message ||
-            "Unable to analyze the wardrobe image.",
-        },
-        {
-          status:
-            response.status >= 400 &&
-            response.status < 600
-              ? response.status
-              : 500,
-        }
+      throw new Error(
+        "OpenClaw returned an invalid response."
+      );
+    }
+
+    if (
+      openClawResponse?.status &&
+      openClawResponse.status !== "ok"
+    ) {
+      throw new Error(
+        extractErrorText(
+          stdout,
+          stderr
+        )
       );
     }
 
     const modelText =
-      extractResponseText(
-        responseJson
+      extractOpenClawText(
+        openClawResponse
       );
 
     if (!modelText) {
       throw new Error(
-        "The vision model returned no analysis."
+        "OpenClaw returned no wardrobe analysis."
       );
     }
 
@@ -584,44 +717,6 @@ The resulting wearing_intent will later be passed to an image and video generati
         extractJson(modelText)
       );
 
-    const uploadId =
-      crypto.randomUUID();
-
-    await fs.mkdir(
-      UPLOAD_DIRECTORY,
-      {
-        recursive: true,
-      }
-    );
-
-    const extension =
-      extensionForMimeType(
-        mimeType
-      );
-
-    const filename =
-      `${uploadId}${extension}`;
-
-    const absolutePath =
-      path.join(
-        UPLOAD_DIRECTORY,
-        filename
-      );
-
-    await fs.writeFile(
-      absolutePath,
-      buffer
-    );
-
-    const relativePath =
-      path
-        .relative(
-          WORKSPACE,
-          absolutePath
-        )
-        .split(path.sep)
-        .join("/");
-
     return NextResponse.json({
       status: "analyzed",
 
@@ -629,11 +724,17 @@ The resulting wearing_intent will later be passed to an image and video generati
         id: uploadId,
         filename,
         local_path: relativePath,
+        absolute_path: absolutePath,
         mime_type: mimeType,
         size: file.size,
       },
 
       analysis: parsed,
+
+      engine: {
+        provider: "openclaw",
+        agent: OPENCLAW_AGENT,
+      },
     });
   } catch (error) {
     console.error(
