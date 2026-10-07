@@ -36,10 +36,15 @@ function normalizeMessages(messages: unknown): ChatMessage[] {
         (message as Record<string, unknown>).content !== undefined
       );
     })
-    .map((message) => ({
-      role: message.role === "assistant" ? "assistant" : "user",
-      content: String(message.content).trim(),
-    }))
+    .map(
+      (message): ChatMessage => ({
+        role:
+          message.role === "assistant"
+            ? "assistant"
+            : "user",
+        content: String(message.content).trim(),
+      })
+    )
     .filter((message) => message.content.length > 0)
     .slice(-8);
 }
@@ -60,7 +65,9 @@ function extractText(result: unknown): string {
     [];
 
   const textPayload = payloads.find(
-    (payload) => typeof payload?.text === "string" && payload.text.trim()
+    (payload) =>
+      typeof payload?.text === "string" &&
+      payload.text.trim()
   );
 
   return textPayload?.text?.trim() || "";
@@ -72,7 +79,11 @@ function buildPrompt(
 ): string {
   const conversation = messages
     .map((message) => {
-      const speaker = message.role === "user" ? "USER" : "APARNA";
+      const speaker =
+        message.role === "user"
+          ? "USER"
+          : "APARNA";
+
       return `${speaker}: ${message.content}`;
     })
     .join("\n");
@@ -215,7 +226,8 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const sessionId =
-      typeof body?.session_id === "string" && body.session_id.trim()
+      typeof body?.session_id === "string" &&
+      body.session_id.trim()
         ? body.session_id.trim()
         : DEFAULT_SESSION_ID;
 
@@ -231,7 +243,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const prompt = buildPrompt(messages, sessionId);
+    const prompt = buildPrompt(
+      messages,
+      sessionId
+    );
 
     const args = [
       "agent",
@@ -244,19 +259,20 @@ export async function POST(request: Request) {
       "--json",
     ];
 
-    const { stdout, stderr } = await execFileAsync(
-      OPENCLAW_BIN,
-      args,
-      {
-        cwd:
-          process.env.OPENCLAW_WORKSPACE ||
-          `${process.env.HOME}/.openclaw/workspace-aparna`,
-        maxBuffer: 10 * 1024 * 1024,
-        env: {
-          ...process.env,
-        },
-      }
-    );
+    const { stdout, stderr } =
+      await execFileAsync(
+        OPENCLAW_BIN,
+        args,
+        {
+          cwd:
+            process.env.OPENCLAW_WORKSPACE ||
+            `${process.env.HOME}/.openclaw/workspace-aparna`,
+          maxBuffer: 10 * 1024 * 1024,
+          env: {
+            ...process.env,
+          },
+        }
+      );
 
     let openClawResponse: unknown;
 
@@ -266,21 +282,28 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           status: "error",
-          error: "OpenClaw returned invalid JSON.",
-          details: stderr?.trim() || stdout?.slice(0, 1000),
+          error:
+            "OpenClaw returned invalid JSON.",
+          details:
+            stderr?.trim() ||
+            stdout?.slice(0, 1000),
         },
         { status: 502 }
       );
     }
 
-    const reply = extractText(openClawResponse);
+    const reply = extractText(
+      openClawResponse
+    );
 
     if (!reply) {
       return NextResponse.json(
         {
           status: "error",
-          error: "OpenClaw returned no text response.",
-          details: stderr?.trim() || null,
+          error:
+            "OpenClaw returned no text response.",
+          details:
+            stderr?.trim() || null,
         },
         { status: 502 }
       );
@@ -293,9 +316,14 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Unknown error";
+      error instanceof Error
+        ? error.message
+        : "Unknown error";
 
-    console.error("Aparna chat error:", error);
+    console.error(
+      "Aparna chat error:",
+      error
+    );
 
     return NextResponse.json(
       {

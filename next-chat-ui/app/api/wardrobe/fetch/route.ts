@@ -7,8 +7,7 @@ export async function POST(
   request: Request
 ) {
   try {
-    const body =
-      await request.json();
+    const body = await request.json();
 
     const url =
       typeof body?.url === "string"
@@ -34,7 +33,7 @@ export async function POST(
       status: "preview",
       product,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       "WARDROBE FETCH ERROR:",
       error
@@ -43,8 +42,9 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          error?.message ||
-          "Unable to fetch product.",
+          error instanceof Error
+            ? error.message
+            : "Unable to fetch product.",
       },
       {
         status: 500,

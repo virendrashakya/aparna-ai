@@ -26,7 +26,347 @@ const looks = [
   { image: "/generated/aparna-1791202299580.jpg", label: "03 / after dark" },
 ];
 
-export default function LandingPage() {
+const locations = [
+  "Bedroom",
+  "Living room",
+  "Kitchen",
+  "Balcony",
+  "Cafe",
+  "Restaurant",
+  "Office",
+  "Outdoor",
+];
+
+const shots = [
+  "Selfie",
+  "Mirror",
+  "Full body",
+  "Half body",
+  "Casual phone photo",
+  "Fashion portrait",
+];
+
+const reelStyles = [
+  "indian_glam_thirst_trap",
+  "mirror_glam",
+  "saree_glam",
+  "bodycon_glam",
+  "night_out_glam",
+  "resort_glam",
+];
+
+type WearingIntent = {
+  id: string;
+  name: string;
+};
+
+type WardrobeItem = {
+  id: string;
+  name: string;
+  type: string;
+  category: string;
+  brand: string;
+  image_reference?: {
+    front?: string | null;
+    back?: string | null;
+    detail?: string | null;
+  };
+  wearing_intents?: WearingIntent[];
+  status: string;
+};
+
+export default function Home() {
+  const [time, setTime] =
+    useState("Evening");
+
+  const [mood, setMood] =
+    useState("Confident");
+
+  const [outfit, setOutfit] =
+    useState("");
+
+  const [wearingIntent, setWearingIntent] =
+    useState("default");
+
+  const [location, setLocation] =
+    useState("Living room");
+
+  const [shot, setShot] =
+    useState("Full body");
+
+  const [reelStyle, setReelStyle] =
+    useState(
+      "indian_glam_thirst_trap"
+    );
+
+  const [thirstLevel, setThirstLevel] =
+    useState(4);
+
+  const [reelDuration, setReelDuration] =
+    useState(8);
+
+  const [wardrobe, setWardrobe] =
+    useState<WardrobeItem[]>([]);
+
+  const [image, setImage] =
+    useState<string | null>(null);
+
+  const [video, setVideo] =
+    useState<string | null>(null);
+
+  const [loadingImage, setLoadingImage] =
+    useState(false);
+
+  const [loadingVideo, setLoadingVideo] =
+    useState(false);
+
+  const [loadingWardrobe, setLoadingWardrobe] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  async function loadWardrobe() {
+    try {
+      setLoadingWardrobe(true);
+
+      const response =
+        await fetch(
+          "/api/wardrobe",
+          {
+            cache: "no-store",
+          }
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          "Unable to load wardrobe."
+        );
+      }
+
+      const data =
+        await response.json();
+
+      const items =
+        Array.isArray(data.items)
+          ? data.items
+          : [];
+
+      setWardrobe(items);
+
+      if (
+        items.length > 0 &&
+        !items.some(
+          (item: WardrobeItem) =>
+            item.id === outfit
+        )
+      ) {
+        setOutfit(
+          items[0].id
+        );
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to load wardrobe."
+      );
+    } finally {
+      setLoadingWardrobe(false);
+    }
+  }
+
+  useEffect(() => {
+    loadWardrobe();
+  }, []);
+
+  const selectedWardrobeItem =
+    wardrobe.find(
+      (item) =>
+        item.id === outfit
+    );
+
+  useEffect(() => {
+    const intents =
+      selectedWardrobeItem
+        ?.wearing_intents ||
+      [];
+
+    if (
+      wearingIntent !==
+        "default" &&
+      !intents.some(
+        (item) =>
+          item.id === wearingIntent
+      )
+    ) {
+      setWearingIntent(
+        "default"
+      );
+    }
+  }, [
+    outfit,
+    selectedWardrobeItem,
+    wearingIntent,
+  ]);
+
+  async function generateImage() {
+    if (!outfit) {
+      setError(
+        "Add at least one garment to the wardrobe first."
+      );
+
+      return;
+    }
+
+    setLoadingImage(true);
+    setError("");
+    setImage(null);
+    setVideo(null);
+
+    try {
+      const response =
+        await fetch(
+          "/api/aparna/generate",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              time,
+              mood,
+              outfit_id:
+                outfit,
+
+              wearing_intent_id:
+                wearingIntent,
+
+              location,
+              shot,
+
+              content_type:
+                "reel_cover",
+
+              reel_style:
+                reelStyle,
+
+              thirst_level:
+                thirstLevel,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Image generation failed"
+        );
+      }
+
+      setImage(
+        data.image
+      );
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong"
+      );
+    } finally {
+      setLoadingImage(false);
+    }
+  }
+
+  async function generateReel() {
+    if (!image) {
+      setError(
+        "Generate the Aparna frame first."
+      );
+
+      return;
+    }
+
+    setLoadingVideo(true);
+    setError("");
+    setVideo(null);
+
+    try {
+      const response =
+        await fetch(
+          "/api/aparna/reel",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              image,
+
+              reel_style:
+                reelStyle,
+
+              thirst_level:
+                thirstLevel,
+
+              duration:
+                reelDuration,
+
+              location,
+              mood,
+              shot,
+
+              outfit_id:
+                outfit,
+
+              wearing_intent_id:
+                wearingIntent,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "Reel generation failed"
+        );
+      }
+
+      setVideo(
+        data.video
+      );
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Reel generation failed."
+      );
+    } finally {
+      setLoadingVideo(false);
+    }
+  }
+
+  const busy =
+    loadingImage ||
+    loadingVideo;
+
+  const intents =
+    selectedWardrobeItem
+      ?.wearing_intents ||
+    [];
+
   return (
     <main className="landing">
       <nav className="landing-nav">

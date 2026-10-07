@@ -652,7 +652,7 @@ export default function AddWardrobeItem({
                         marginTop: 0,
                       }}
                     >
-                      Aparna's wardrobe will
+                      Aparnas wardrobe will
                       remember not only what the
                       garment is, but the styling
                       seen in this reference.

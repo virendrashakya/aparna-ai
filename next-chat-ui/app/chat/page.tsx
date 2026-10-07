@@ -88,7 +88,7 @@ export default function ChatPage() {
     setIsThinking(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/wardrobe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
