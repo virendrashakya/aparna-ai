@@ -42,6 +42,20 @@ const shots = [
   "Half body",
   "Casual phone photo",
   "Fashion portrait",
+  "Low angle perspective",
+  "Close perspective",
+  "Over the shoulder",
+  "Candid side angle",
+];
+
+const photographyStyles = [
+  "candid_realism",
+  "intimate_editorial",
+  "desi_fusion_editorial",
+  "smartphone_lifestyle",
+  "window_light_natural",
+  "direct_flash_editorial",
+  "perspective_social",
 ];
 
 const reelStyles = [
@@ -96,6 +110,9 @@ export default function Home() {
     useState(
       "indian_glam_thirst_trap"
     );
+
+  const [photographyStyle, setPhotographyStyle] =
+    useState("candid_realism");
 
   const [thirstLevel, setThirstLevel] =
     useState(4);
@@ -434,6 +451,42 @@ export default function Home() {
 
           <div className="control">
             <label>
+              PHOTOGRAPHY STYLE
+            </label>
+
+            <select
+              value={photographyStyle}
+              onChange={(event) =>
+                setPhotographyStyle(
+                  event.target.value
+                )
+              }
+            >
+              {photographyStyles.map(
+                (item) => (
+                  <option
+                    key={item}
+                    value={item}
+                  >
+                    {item
+                      .replaceAll(
+                        "_",
+                        " "
+                      )
+                      .toUpperCase()}
+                  </option>
+                )
+              )}
+            </select>
+
+            <small>
+              Controls camera feel, framing,
+              lighting and editorial realism.
+            </small>
+          </div>
+
+          <div className="control">
+            <label>
               THIRST LEVEL —{" "}
               {thirstLevel}/5
             </label>
@@ -739,13 +792,11 @@ export default function Home() {
                 </h2>
 
                 <p>
-                  Upload real clothing
-                  references into her
-                  wardrobe, preserve how
-                  they are worn, then use
-                  the resolved look for
-                  image and video
-                  generation.
+                  Build a believable Aparna
+                  photo session from her
+                  canonical wardrobe, wearing
+                  intent, environment and
+                  photography style.
                 </p>
               </div>
             )}
