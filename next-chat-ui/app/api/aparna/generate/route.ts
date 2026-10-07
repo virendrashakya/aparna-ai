@@ -31,6 +31,16 @@ const VALID_REEL_STYLES = [
   "resort_glam",
 ];
 
+const VALID_PHOTOGRAPHY_STYLES = [
+  "candid_realism",
+  "intimate_editorial",
+  "desi_fusion_editorial",
+  "smartphone_lifestyle",
+  "window_light_natural",
+  "direct_flash_editorial",
+  "perspective_social",
+];
+
 function normalizeThirstLevel(value: unknown) {
   if (value === undefined || value === null || value === "") {
     return 4;
@@ -57,6 +67,7 @@ export async function POST(request: Request) {
       time,
       mood,
       outfit_id,
+      wearing_intent_id,
       location,
       shot,
     } = body;
@@ -76,6 +87,14 @@ export async function POST(request: Request) {
       )
         ? body.reel_style
         : "indian_glam_thirst_trap";
+
+    const photographyStyle =
+      typeof body.photography_style === "string" &&
+      VALID_PHOTOGRAPHY_STYLES.includes(
+        body.photography_style
+      )
+        ? body.photography_style
+        : "candid_realism";
 
     const thirstLevel =
       normalizeThirstLevel(
@@ -124,6 +143,8 @@ export async function POST(request: Request) {
       outfit_id,
       location,
       shot,
+      wearing_intent_id,
+      photographyStyle,
       contentType,
       reelStyle,
       thirstLevel,
@@ -158,6 +179,12 @@ ${location}
 CAMERA / SHOT:
 ${shot}
 
+PHOTOGRAPHY STYLE:
+${photographyStyle}
+
+WEARING INTENT:
+${wearing_intent_id || "default"}
+
 CONTENT TYPE:
 ${contentType}
 
@@ -178,18 +205,22 @@ This image is a frame/cover for a short-form Instagram Reel.
 
 The Reel direction is:
 
-INDIAN GLAM THIRST-TRAP FASHION
+REALISTIC INDIAN FASHION + LIFESTYLE EDITORIAL
 
 The content should be:
 
-- glamorous
-- confident
-- revealing fashion
-- flirtatious
-- visually attention-grabbing
+- highly photorealistic
+- socially native
 - fashion-forward
-- social-media-native
-- realistic
+- Indian/Desi when appropriate
+- confident
+- visually attention-grabbing
+- physically believable
+- intimate or bold when the selected wardrobe and mood support it
+
+Do not make every Reel look like a thirst trap.
+The selected photography style and scene should determine the visual
+language first.
 
 Aparna can deliberately pose for the camera.
 
@@ -598,6 +629,101 @@ ${
 }
 
 ============================================================
+PHOTOGRAPHY STYLE
+============================================================
+
+Use the selected photography style as a concrete visual direction.
+
+STYLE:
+${photographyStyle}
+
+Apply these principles:
+
+candid_realism:
+- looks like a real photograph captured during everyday life
+- imperfect framing is acceptable
+- natural posture and unforced expression
+- ordinary environmental details
+- avoid polished campaign perfection
+
+intimate_editorial:
+- refined fashion-editorial composition
+- intimate camera distance
+- controlled but believable lighting
+- strong silhouette and body language
+- still photographic, never CGI or studio-plastic
+
+desi_fusion_editorial:
+- modern Indian woman + contemporary fashion/editorial language
+- blend Western and Indian styling naturally
+- sarees, blouses, jewellery and Indian textiles when selected
+- contemporary apartment/interior context when appropriate
+- never turn the scene into costume photography
+
+smartphone_lifestyle:
+- believable modern smartphone perspective
+- slightly imperfect framing
+- natural computational-camera exposure
+- authentic social-media photograph feeling
+- avoid DSLR-commercial polish
+
+window_light_natural:
+- directional daylight from a believable window
+- soft-to-moderate shadows
+- natural indoor color
+- realistic exposure falloff
+- lived-in room details
+
+direct_flash_editorial:
+- direct on-camera flash
+- harder shadows
+- realistic specular highlights
+- slightly raw nightlife/editorial feeling
+- preserve skin texture rather than smoothing it
+
+perspective_social:
+- close or unusual camera perspective
+- foreground/background depth
+- mild wide-angle spatial exaggeration when appropriate
+- strong visual hook
+- keep anatomy physically plausible
+
+Across all styles:
+- preserve photographic imperfections
+- prioritize believable camera geometry
+- do not over-retouch skin
+- do not make every image symmetrical
+- do not force a model pose
+- let furniture, floor, bed, walls and clothing physically interact
+- use realistic compression where the body contacts a surface
+- maintain continuity with Aparna's established environment
+
+============================================================
+PHOTO-SESSION AESTHETIC
+============================================================
+
+Think of the result as a frame from a real photo session, not an
+"AI influencer image".
+
+A strong image can be:
+- ordinary but beautiful
+- candid
+- fashion-led
+- intimate
+- bold
+- playful
+- Desi
+- experimental
+
+The visual story should come from the combination of:
+Aparna + wardrobe + wearing intent + location + activity + camera.
+
+Do not add revealing exposure merely to increase engagement.
+When the selected garment is already bold, emphasize its real
+construction, fit, drape and silhouette rather than inventing a more
+revealing version.
+
+============================================================
 PHOTOGRAPHIC REALISM
 ============================================================
 
@@ -884,6 +1010,9 @@ After generation, return:
         outfit_id,
         location,
         shot,
+        photography_style: photographyStyle,
+        wearing_intent_id:
+          wearing_intent_id || "default",
         content_type: contentType,
         reel_style: reelStyle,
         thirst_level: thirstLevel,
