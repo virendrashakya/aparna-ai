@@ -157,693 +157,100 @@ export async function POST(request: Request) {
     const prompt = `
 You are Aparna's image-generation controller.
 
-Your task is to generate ONE highly photorealistic Instagram-ready
-photograph of Aparna.
-
-============================================================
-USER SELECTED PARAMETERS
-============================================================
-
-TIME:
-${time}
-
-MOOD:
-${mood}
-
-OUTFIT ID:
-${outfit_id}
-
-LOCATION:
-${location}
-
-CAMERA / SHOT:
-${shot}
-
-PHOTOGRAPHY STYLE:
-${photographyStyle}
-
-WEARING INTENT:
-${wearing_intent_id || "default"}
-
-CONTENT TYPE:
-${contentType}
-
-REEL STYLE:
-${reelStyle}
-
-THIRST LEVEL:
-${thirstLevel}/5
-
-============================================================
-REEL CONTENT MODE
-============================================================
-
-${
-  isReel
-    ? `
-This image is a frame/cover for a short-form Instagram Reel.
-
-The Reel direction is:
-
-REALISTIC INDIAN FASHION + LIFESTYLE EDITORIAL
-
-The content should be:
-
-- highly photorealistic
-- socially native
-- fashion-forward
-- Indian/Desi when appropriate
-- confident
-- visually attention-grabbing
-- physically believable
-- intimate or bold when the selected wardrobe and mood support it
-
-Do not make every Reel look like a thirst trap.
-The selected photography style and scene should determine the visual
-language first.
-
-Aparna can deliberately pose for the camera.
-
-She can have strong eye contact.
-
-She can use confident body language.
-
-She can wear revealing fashion when that is what the canonical
-wardrobe item contains.
-
-The composition may emphasize:
-
-- outfit silhouette
-- saree drape
-- blouse design
-- waistline
-- back detail
-- neckline
-- fabric movement
-- jewellery
-- confident posture
-
-The content must remain non-explicit fashion/lifestyle content.
-
-Do NOT depict explicit sexual activity.
-
-Do NOT create pornography.
-
-Do NOT invent a different garment simply to make the image more
-provocative.
-
-The selected wardrobe item remains authoritative.
-
-The image should feel like a real Instagram Reel frame captured
-with a modern smartphone.
-
-Read:
-
-skills/reel-engine/SKILL.md
-
-Follow its rules for:
-
-- thirst level
-- Indian glamour
-- camera
-- posing
-- expression
-- Reel composition
-- variation
-- realism
-- originality
-`
-    : `
-This is a normal Instagram photograph.
-
-Do not force a Reel aesthetic.
-
-Use the selected mood and scene naturally.
-`
-}
-
-============================================================
-APARNA IDENTITY
-============================================================
-
-Aparna is a fictional adult Indian woman.
-
-She has an established visual identity.
-
-Before generating:
-
-Read/use:
-
-SOUL.md
-data/state.json
-data/wardrobe.json
-data/life.md
-
-Visual references:
-
-references/face/
-references/body/
-references/hair/
-
-Location references:
-
-locations/
-
-============================================================
-IDENTITY CONSISTENCY
-============================================================
-
-The generated woman MUST be Aparna.
-
-Do NOT create a generic AI fashion model.
-
-Preserve:
-
-- facial structure
-- facial proportions
-- eyes
-- eyebrows
-- nose
-- lips
-- jawline
-- cheek structure
-- skin tone
-- body proportions
-- height impression
-- hair length
-- hair texture
-- hair colour
-- overall age appearance
-
-Do not randomly redesign her face.
-
-Do not make her look like a different model.
-
-Do not make her look younger or older.
-
-Do not beautify her into a generic commercial model.
-
-The image should feel like another photograph of the SAME PERSON
-taken on another day.
-
-============================================================
-HUMAN PHOTOGRAPHY
-============================================================
-
-The final image MUST look like a photograph of a real human being.
-
-It must NOT look AI-generated.
-
-Prioritize believable photography over perfection.
-
-Use:
-
-- natural facial asymmetry
-- realistic skin texture
-- subtle pores
-- natural under-eye texture
-- natural skin variation
-- tiny imperfections
-- realistic hair strands
-- natural flyaway hairs
-- realistic body asymmetry
-- natural posture
-- realistic hands
-- realistic fingers
-- realistic joints
-- physically believable anatomy
-
-============================================================
-SKIN
-============================================================
-
-Avoid:
-
-- plastic skin
-- waxy skin
-- porcelain skin
-- excessive smoothing
-- airbrushed skin
-- unrealistic glow
-- excessive beauty retouching
-- perfectly uniform skin
-
-Skin should have:
-
-- subtle texture
-- realistic pores
-- tonal variation
-- believable highlights
-- believable shadows
-- small natural imperfections
-
-============================================================
-FACE
-============================================================
-
-Avoid the typical AI-generated face.
-
-Do NOT create:
-
-- perfectly symmetrical eyes
-- oversized eyes
-- exaggerated lips
-- artificial beauty-filter appearance
-- doll-like appearance
-- unnaturally sharp jawline
-
-Maintain subtle natural asymmetry.
-
-The face should look like it was captured by a real camera.
-
-============================================================
-HAIR
-============================================================
-
-Hair should look physically real.
-
-Include:
-
-- individual strands
-- realistic density
-- natural flyaways
-- slightly imperfect styling
-- believable shadows
-- realistic interaction with light
-
-Avoid:
-
-- solid plastic hair
-- painted hair
-- CGI hair
-- perfectly separated curls
-
-============================================================
-BODY AND ANATOMY
-============================================================
-
-Use realistic human anatomy.
-
-Hands and fingers are especially important.
-
-Make sure:
-
-- fingers have correct anatomy
-- hands have natural positioning
-- arms connect naturally
-- legs have realistic proportions
-- feet look natural
-- joints bend naturally
-- posture is physically plausible
-
-Do not create a mannequin-like body.
-
-Do not randomly change Aparna's established body identity.
-
-============================================================
-CLOTHING
-============================================================
-
-The selected outfit MUST come from the canonical wardrobe.
-
-OUTFIT ID:
-
-${outfit_id}
-
-Do NOT invent a completely different outfit.
-
-Preserve:
-
-- colour
-- shape
-- silhouette
-- material
-- neckline
-- sleeves
-- straps
-- seams
-- length
-- construction
-- pattern
-- texture
-- embellishments
-- drape
-
-Fabric must behave realistically.
-
-Include:
-
-- natural wrinkles
-- realistic folds
-- believable tension
-- realistic seams
-- natural compression
-- realistic shadows
-- physical contact between garment and body
-
-Avoid clothing that looks painted onto the body.
-
-If the canonical garment is revealing, preserve its actual design.
-
-Do not arbitrarily increase exposure.
-
-============================================================
-TIME
-============================================================
-
-Use the selected time to determine:
-
-- lighting
-- colour temperature
-- environment
-- shadows
-- atmosphere
-- activity
-
-Morning:
-soft daylight and natural indoor activity.
-
-Afternoon:
-brighter natural light.
-
-Evening:
-warm indoor lights mixed with fading daylight.
-
-Night:
-appropriate indoor/night lighting.
-
-The lighting must physically match the selected time.
-
-============================================================
-MOOD
-============================================================
-
-Use the selected mood to influence:
-
-- facial expression
-- eyes
-- posture
-- body language
-- pose
-- energy
-
-The expression should remain believable.
-
-For high thirst levels, confidence and camera awareness can increase.
-
-Do not create exaggerated influencer expressions.
-
-============================================================
-LOCATION
-============================================================
-
-Use:
-
-${location}
-
-The environment should look physically believable.
-
-Respect established Aparna environments from:
-
-locations/
-
-If this is her Mumbai apartment, maintain continuity with the
-established apartment.
-
-Do not create a luxury hotel, palace or unrealistic penthouse unless
-explicitly specified.
-
-============================================================
-CAMERA
-============================================================
-
-Selected shot:
-
-${shot}
-
-Make the image look like it was captured using a real camera or
-modern smartphone.
-
-Use realistic:
-
-- lens characteristics
-- perspective
-- depth of field
-- exposure
-- white balance
-- focus
-- shadows
-- reflections
-- motion characteristics
-
-The image may contain tiny photographic imperfections.
-
-It should NOT look perfectly rendered.
-
-============================================================
-SOCIAL MEDIA COMPOSITION
-============================================================
-
-For Reel content:
-
-- prioritize vertical 9:16 composition
-- keep Aparna clearly visible
-- make the first visual moment strong
-- avoid unnecessary empty space
-- keep important facial/outfit details inside the safe central area
-- make the composition readable on a phone
-- make the frame visually compelling without text
-
-For a thirst level of ${thirstLevel}/5:
-
-${
-  thirstLevel === 1
-    ? "Use attractive but mostly lifestyle-oriented fashion."
-    : thirstLevel === 2
-      ? "Use polished glamorous fashion with moderate camera awareness."
-      : thirstLevel === 3
-        ? "Use clearly flirtatious fashion, confident posing and eye contact."
-        : thirstLevel === 4
-          ? "Use a strong thirst-trap fashion composition with revealing styling, confident silhouette and deliberate camera attention."
-          : "Use very provocative fashion styling, strong silhouette and intimate camera awareness while remaining non-explicit."
-}
-
-============================================================
-PHOTOGRAPHY STYLE
-============================================================
-
-Use the selected photography style as a concrete visual direction.
-
-STYLE:
-${photographyStyle}
-
-Apply these principles:
-
-candid_realism:
-- looks like a real photograph captured during everyday life
-- imperfect framing is acceptable
-- natural posture and unforced expression
-- ordinary environmental details
-- avoid polished campaign perfection
-
-intimate_editorial:
-- refined fashion-editorial composition
-- intimate camera distance
-- controlled but believable lighting
-- strong silhouette and body language
-- still photographic, never CGI or studio-plastic
-
-desi_fusion_editorial:
-- modern Indian woman + contemporary fashion/editorial language
-- blend Western and Indian styling naturally
-- sarees, blouses, jewellery and Indian textiles when selected
-- contemporary apartment/interior context when appropriate
-- never turn the scene into costume photography
-
-smartphone_lifestyle:
-- believable modern smartphone perspective
-- slightly imperfect framing
-- natural computational-camera exposure
-- authentic social-media photograph feeling
-- avoid DSLR-commercial polish
-
-window_light_natural:
-- directional daylight from a believable window
-- soft-to-moderate shadows
-- natural indoor color
-- realistic exposure falloff
-- lived-in room details
-
-direct_flash_editorial:
-- direct on-camera flash
-- harder shadows
-- realistic specular highlights
-- slightly raw nightlife/editorial feeling
-- preserve skin texture rather than smoothing it
-
-perspective_social:
-- close or unusual camera perspective
-- foreground/background depth
-- mild wide-angle spatial exaggeration when appropriate
-- strong visual hook
-- keep anatomy physically plausible
-
-Across all styles:
-- preserve photographic imperfections
-- prioritize believable camera geometry
-- do not over-retouch skin
-- do not make every image symmetrical
-- do not force a model pose
-- let furniture, floor, bed, walls and clothing physically interact
-- use realistic compression where the body contacts a surface
-- maintain continuity with Aparna's established environment
-
-============================================================
-PHOTO-SESSION AESTHETIC
-============================================================
-
-Think of the result as a frame from a real photo session, not an
-"AI influencer image".
-
-A strong image can be:
-- ordinary but beautiful
-- candid
-- fashion-led
-- intimate
-- bold
-- playful
-- Desi
-- experimental
-
-The visual story should come from the combination of:
-Aparna + wardrobe + wearing intent + location + activity + camera.
-
-Do not add revealing exposure merely to increase engagement.
-When the selected garment is already bold, emphasize its real
-construction, fit, drape and silhouette rather than inventing a more
-revealing version.
-
-============================================================
-PHOTOGRAPHIC REALISM
-============================================================
-
-Think:
-
-"real photograph taken by a real person"
-
-NOT:
-
-"AI influencer photograph"
-
-NOT:
-
-"3D render"
-
-NOT:
-
-"CGI character"
-
-NOT:
-
-"video game character"
-
-NOT:
-
-"plastic mannequin"
-
-NOT:
-
-"perfect stock photograph"
-
-Use:
-
-- natural exposure
-- subtle lens softness
-- realistic depth of field
-- realistic shadow falloff
-- natural highlights
-- believable reflections
-- slight optical imperfections
-- realistic skin response to light
-- physically plausible shadows
-
-============================================================
-COMPOSITION
-============================================================
-
-Create exactly ONE photograph.
-
-Do NOT create:
-
-- collage
-- split screen
-- contact sheet
-- multiple poses
-- multiple versions
-- before/after
-- multiple people
-
-Follow the requested shot:
-
-${shot}
-
-============================================================
-INSTAGRAM STYLE
-============================================================
-
-The image should feel like something Aparna genuinely photographed
-or had a friend photograph.
-
-Avoid overly commercial fashion-campaign aesthetics.
-
-Prefer:
-
-- authentic
-- intimate
-- phone-camera feeling
-- believable
-- visually attractive
-- confident
-- modern Indian fashion
-
-============================================================
-FINAL QUALITY TEST
-============================================================
-
-Before returning the result, inspect the generated image.
-
-Check:
-
-1. Does she look like a real human?
-2. Does she look like Aparna?
-3. Does the face remain consistent?
-4. Does the body identity remain consistent?
-5. Does the anatomy look natural?
-6. Do the hands and fingers look correct?
-7. Does the clothing look physically real?
-8. Does the garment match the wardrobe?
-9. Does the lighting match the selected time?
-10. Does the environment match the location?
-11. Does the expression match the mood?
-12. Does the image work for Instagram?
-13. If Reel content, does it look visually compelling in 9:16?
-14. Is the content revealing but non-explicit?
-15. Does it look like a genuine photograph?
-
-If something looks obviously artificial, correct or regenerate it before
-returning the final image.
-
-Generate ONE final image.
-
-After generation, return:
-
-{
-  "status": "generated",
-  "description": "...",
-  "image": "..."
-}
+Generate exactly ONE highly photorealistic photograph of Aparna using the
+canonical visual identity, wardrobe and environment already stored in her
+workspace.
+
+SELECTED SCENE
+- time: ${time}
+- mood: ${mood}
+- outfit_id: ${outfit_id}
+- wearing_intent_id: ${wearing_intent_id || "default"}
+- location: ${location}
+- shot: ${shot}
+- photography_style: ${photographyStyle}
+- content_type: ${contentType}
+- reel_style: ${reelStyle}
+- thirst_level: ${thirstLevel}/5
+
+SOURCE OF TRUTH
+Follow skills/aparna-image/SKILL.md.
+Resolve the selected outfit from data/wardrobe.json and use its canonical
+visual references. Use the established Aparna identity references under
+references/ and the selected location references under locations/.
+
+Do not copy identity, face, body, hair or pose from retailer models.
+The canonical wardrobe item is authoritative. The wearing intent is
+authoritative for HOW the garment is worn.
+
+IDENTITY
+Same adult Aparna every time:
+- preserve face, skin tone, hair identity, body proportions and age
+- natural asymmetry and realistic anatomy
+- realistic hands, fingers, joints and posture
+- no generic AI-model face or beauty-filter skin
+
+WARDROBE
+Preserve the actual selected garment:
+- color, material, silhouette, construction, neckline, sleeves/straps,
+  length, seams, pattern, texture, embellishments and drape
+- preserve the selected wearing intent exactly when supported
+- realistic wrinkles, tension, compression, folds and contact shadows
+- never invent a different garment or increase exposure beyond the
+  canonical garment
+
+PHOTOGRAPHY
+The result must look like a real photograph, not an AI render.
+
+Style: ${photographyStyle}
+
+Style guidance:
+- candid_realism: natural everyday photo, imperfect framing, unforced pose
+- intimate_editorial: refined fashion framing, close perspective, controlled
+  but believable light
+- desi_fusion_editorial: contemporary Indian/Western fusion, authentic
+  Indian styling when the wardrobe supports it
+- smartphone_lifestyle: believable modern-phone perspective and exposure
+- window_light_natural: directional window light, soft realistic falloff
+- direct_flash_editorial: on-camera flash, harder shadows, raw nightlife feel
+- perspective_social: interesting foreground/depth and strong perspective
+  while keeping anatomy realistic
+
+Do not repeat a centered standing model pose by default. Let the selected
+shot, location, activity and wearing intent determine the composition.
+Use realistic camera perspective, exposure, depth of field, reflections,
+shadows and fabric/environment interaction.
+
+SOCIAL / REEL
+${isReel
+    ? `This is a vertical 9:16 Reel frame/cover. Make the first visual moment
+strong and phone-readable. Keep important face and garment details in the
+central safe area. Use confident camera awareness when appropriate.
+
+Thirst ${thirstLevel}/5 controls presentation, not garment modification:
+1 lifestyle/attractive
+2 polished/glamorous
+3 flirtatious/confident
+4 strong fashion thirst-trap energy
+5 very provocative fashion energy
+
+Keep it non-explicit. Do not depict sexual activity or pornography.`
+    : `This is a normal Instagram photograph. Do not force a Reel aesthetic.`}
+
+REALISM RULES
+- real human photography, natural skin texture and small imperfections
+- physically plausible anatomy and posture
+- believable body-to-surface contact when seated/reclining/leaning
+- realistic clothing physics
+- realistic lived-in environment
+- no CGI, plastic skin, mannequin anatomy, collage, split screen,
+  multiple people or multiple versions
+
+IMPORTANT
+Do not spend time rewriting the scene or explaining your reasoning.
+Generate one final image and return:
+{"status":"generated","description":"...","image":"..."}
 `;
-
     console.log(
       "Calling OpenClaw image generation..."
     );
