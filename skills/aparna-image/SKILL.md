@@ -492,7 +492,226 @@ Avoid:
 
 ---
 
-# 16. EXACTLY ONE IMAGE
+# 16. REFERENCE AESTHETIC: REALISTIC DESI FASHION LIFESTYLE
+
+The visual target is a believable adult Indian woman photographed in
+real life, not a generic AI fashion model.
+
+The aesthetic may combine:
+
+- contemporary Indian fashion
+- Desi styling
+- Western fashion
+- lingerie-inspired fashion
+- swimwear
+- sarees and blouses
+- athleisure
+- casual homewear
+- editorial fashion
+- intimate lifestyle photography
+
+The important distinction is:
+
+"real woman with a camera"
+
+NOT:
+
+"AI model posing for an AI image generator."
+
+Use this as a style reference at the level of photography principles,
+not as a request to copy another creator's exact image, pose, identity,
+or composition.
+
+---
+
+# 17. PHYSICAL REALISM
+
+Body and clothing must interact with the environment.
+
+When Aparna sits, kneels, leans, reclines or lies on a surface:
+
+- distribute weight naturally
+- show believable contact with the surface
+- allow natural skin compression
+- allow fabric compression and wrinkles
+- preserve realistic joint angles
+- keep hands and feet anatomically plausible
+
+Do not erase every natural fold or asymmetry.
+
+Do not "perfect" the body into a mannequin.
+
+---
+
+# 18. BOLD FASHION WITHOUT FORCED SEXUALIZATION
+
+Aparna can create bold fashion and sensual lifestyle content.
+
+Boldness may come from:
+
+- silhouette
+- neckline
+- back detail
+- fitted garments
+- swimwear
+- lingerie-inspired styling
+- saree draping
+- pose
+- camera perspective
+- lighting
+- confident body language
+- intimate environmental context
+
+Do not make every image sexually suggestive.
+
+Do not arbitrarily remove clothing.
+
+Do not invent a more revealing version of the canonical garment.
+
+If the garment is already revealing, preserve the actual garment and
+let photography, composition and styling create the visual impact.
+
+All generated content remains non-explicit fashion/lifestyle
+photography.
+
+---
+
+# 19. CAMERA LANGUAGE
+
+Use camera choice deliberately.
+
+Possible languages:
+
+### Candid smartphone
+- 24–28mm-equivalent feeling
+- slightly imperfect framing
+- believable phone exposure
+- casual social-media photograph
+
+### Intimate perspective
+- close camera placement
+- foreground depth
+- mild perspective exaggeration
+- strong but believable visual hook
+
+### Natural window portrait
+- 35–50mm feeling
+- directional window light
+- realistic falloff
+- shallow but believable depth of field
+
+### Editorial
+- 50–85mm feeling
+- controlled composition
+- fashion-oriented framing
+- refined but still photographic
+
+### Direct flash
+- on-camera flash feeling
+- harder shadow edges
+- realistic specular highlights
+- rawer nightlife/editorial mood
+
+Do not apply one camera style to every image.
+
+---
+
+# 20. COMPOSITION VARIATION
+
+Avoid repeating the same centered standing portrait.
+
+Useful compositions include:
+
+- over-the-shoulder
+- low perspective
+- close foreground perspective
+- seated
+- reclining
+- kneeling
+- mirror
+- environmental portrait
+- cropped fashion detail
+- side profile
+- rear three-quarter view
+- candid movement
+- asymmetric framing
+
+The pose must still be physically plausible.
+
+Variation should feel like a photographer exploring a real session,
+not random pose generation.
+
+---
+
+# 21. DESI FASHION IDENTITY
+
+When Indian styling is selected, avoid generic "Bollywood costume"
+treatment.
+
+Prefer believable contemporary Indian details:
+
+- saree drape
+- blouse construction
+- Indian jewellery
+- bangles
+- bindis when appropriate
+- regional textiles
+- modern Indian home interiors
+- contemporary fusion styling
+
+The Indian identity should feel lived-in and modern.
+
+---
+
+# 22. ENVIRONMENTAL REALISM
+
+The environment is part of the photograph.
+
+Use:
+
+- real-looking furniture
+- imperfect bedsheets
+- curtains
+- wardrobes
+- windows
+- floors
+- walls
+- ordinary household objects
+- realistic reflections
+- believable clutter
+
+Do not turn every scene into a luxury set.
+
+A premium Mumbai apartment can still look lived-in.
+
+Ordinary environments make exceptional fashion photographs feel more
+credible.
+
+---
+
+# 23. INSTAGRAM PHOTO-SESSION THINKING
+
+A post can feel like one session rather than an isolated generated
+image.
+
+Maintain continuity across related images:
+
+- same outfit
+- same hair
+- same location
+- same lighting period
+- same accessories
+- same physical styling
+
+If multiple images are explicitly requested, vary camera angle and
+composition while preserving the session.
+
+For a single-image request, choose the strongest frame from that
+session concept.
+
+---
+
+# 24. EXACTLY ONE IMAGE
 
 Generate exactly ONE photograph.
 
