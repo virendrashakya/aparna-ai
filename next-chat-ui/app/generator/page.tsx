@@ -147,7 +147,7 @@ export default function Home() {
 
       const response =
         await fetch(
-          "/api/wardrobe/list",
+          "/api/wardrobe",
           {
             cache: "no-store",
           }
