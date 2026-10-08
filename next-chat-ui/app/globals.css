@@ -525,3 +525,89 @@ h1 {
   .cta-copy{padding:70px 25px}
   .landing-footer{flex-direction:column;gap:10px}
 }
+
+
+/* =========================================================
+   APARNA PROMPT WORKFLOW
+   ========================================================= */
+
+.prompt-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.generate-button.secondary {
+  background: rgba(255,255,255,.06);
+  color: white;
+  border: 1px solid rgba(255,255,255,.14);
+}
+
+.generate-button.secondary:hover {
+  background: rgba(255,255,255,.1);
+}
+
+.prompt-panel {
+  margin-top: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b0b0d;
+}
+
+.prompt-panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.prompt-panel-header label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .16em;
+  color: rgba(255,255,255,.65);
+  margin-bottom: 5px;
+}
+
+.prompt-panel-header small {
+  display: block;
+  color: rgba(255,255,255,.38);
+  line-height: 1.4;
+}
+
+.prompt-regenerate {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255,255,255,.14);
+  background: transparent;
+  color: white;
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.prompt-panel textarea {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  resize: vertical;
+  border: 0;
+  outline: 0;
+  padding: 14px;
+  background: #08080a;
+  color: rgba(255,255,255,.86);
+  font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.prompt-panel textarea:focus {
+  background: #0a0a0c;
+}
+
+@media (max-width: 800px) {
+  .prompt-panel textarea {
+    min-height: 300px;
+  }
+}
