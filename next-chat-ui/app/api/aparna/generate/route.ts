@@ -154,8 +154,31 @@ export async function POST(request: Request) {
       contentType === "reel_cover" ||
       contentType === "reel_frame";
 
-    const prompt = `
-You are Aparna's image-generation controller.
+    const suppliedPrompt =
+      typeof body.prompt === "string"
+        ? body.prompt.trim()
+        : "";
+
+    const prompt = suppliedPrompt
+      ? `You are Aparna's image-generation controller.
+
+Use the following approved, model-independent image prompt as the primary generation instruction.
+
+APPROVED IMAGE PROMPT
+---------------------
+${suppliedPrompt}
+---------------------
+
+Before generating, resolve the selected wardrobe item from data/wardrobe.json and use the canonical Aparna identity, wardrobe and location references stored in the workspace. The approved prompt is authoritative for the scene and photographic direction.
+
+Generate exactly ONE image.
+
+Keep the result non-explicit. Do not depict sexual activity or pornography.
+
+Return:
+{"status":"generated","description":"...","image":"..."}
+`
+      : `You are Aparna's image-generation controller.
 
 Generate exactly ONE highly photorealistic photograph of Aparna using the
 canonical visual identity, wardrobe and environment already stored in her
@@ -204,53 +227,28 @@ The result must look like a real photograph, not an AI render.
 
 Style: ${photographyStyle}
 
-Style guidance:
-- candid_realism: natural everyday photo, imperfect framing, unforced pose
-- intimate_editorial: refined fashion framing, close perspective, controlled
-  but believable light
-- desi_fusion_editorial: contemporary Indian/Western fusion, authentic
-  Indian styling when the wardrobe supports it
-- smartphone_lifestyle: believable modern-phone perspective and exposure
-- window_light_natural: directional window light, soft realistic falloff
-- direct_flash_editorial: on-camera flash, harder shadows, raw nightlife feel
-- perspective_social: interesting foreground/depth and strong perspective
-  while keeping anatomy realistic
-
 Do not repeat a centered standing model pose by default. Let the selected
 shot, location, activity and wearing intent determine the composition.
-Use realistic camera perspective, exposure, depth of field, reflections,
-shadows and fabric/environment interaction.
 
 SOCIAL / REEL
-${isReel
-    ? `This is a vertical 9:16 Reel frame/cover. Make the first visual moment
-strong and phone-readable. Keep important face and garment details in the
-central safe area. Use confident camera awareness when appropriate.
-
-Thirst ${thirstLevel}/5 controls presentation, not garment modification:
-1 lifestyle/attractive
-2 polished/glamorous
-3 flirtatious/confident
-4 strong fashion thirst-trap energy
-5 very provocative fashion energy
-
-Keep it non-explicit. Do not depict sexual activity or pornography.`
-    : `This is a normal Instagram photograph. Do not force a Reel aesthetic.`}
+${isReel ? "This is a vertical 9:16 Reel frame/cover." : "This is a normal Instagram photograph."}
+Thirst ${thirstLevel}/5 controls presentation, not garment modification.
 
 REALISM RULES
 - real human photography, natural skin texture and small imperfections
 - physically plausible anatomy and posture
-- believable body-to-surface contact when seated/reclining/leaning
+- believable body-to-surface contact
 - realistic clothing physics
 - realistic lived-in environment
 - no CGI, plastic skin, mannequin anatomy, collage, split screen,
   multiple people or multiple versions
 
-IMPORTANT
-Do not spend time rewriting the scene or explaining your reasoning.
-Generate one final image and return:
+Keep it non-explicit. Do not depict sexual activity or pornography.
+
+Return:
 {"status":"generated","description":"...","image":"..."}
 `;
+
     console.log(
       "Calling OpenClaw image generation..."
     );
